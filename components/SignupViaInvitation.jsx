@@ -266,7 +266,7 @@ export const SignupViaInvitation = () => {
                       marginTop: 10, padding: '8px 10px', borderRadius: 8,
                       background: GP.white, fontSize: 12, color: GP.text, lineHeight: 1.5,
                     }}>
-                      "{invitation.message}"
+                      &ldquo;{invitation.message}&rdquo;
                     </div>
                   )}
                 </div>
