@@ -6,6 +6,7 @@ import { RAZAS, CATEGORIAS_H, CATEGORIAS_M } from '@/lib/data';
 import { Icon } from './Icon';
 import { Button, Field, Input, Textarea, Select, Pill } from './ui';
 import { Modal } from './Modal';
+import { PhotoSlot } from './PhotoSlot';
 
 export const RegisterWizard = ({ finca, animals = [], onClose, onSubmit, saving = false }) => {
   const [step, setStep] = useState(0);
@@ -16,6 +17,7 @@ export const RegisterWizard = ({ finca, animals = [], onClose, onSubmit, saving 
     tipoIngreso: '', fechaIngreso: '', proveedor: '',
     madreId: '', madre: '', padreId: '', padre: '',
     peso: '', precio: '', documento: '', notas: '',
+    photoFile: null,
   });
   const set = (k, v) => setData(d => ({ ...d, [k]: v }));
 
@@ -123,7 +125,12 @@ const Step1 = ({ data, set }) => {
       <Field label="Color y señas" hint="Marcas, manchas, características distintivas">
         <Textarea value={data.color} onChange={v => set('color', v)} placeholder="Ej. Blanco con manchas negras en cuello y patas traseras" rows={2} />
       </Field>
-      <Field label="Foto"><PhotoSlot /></Field>
+      <Field label="Foto" hint="Se usará como placeholder y como primer registro de la galería de crecimiento.">
+        <PhotoSlot
+          value={data.photoFile}
+          onChange={(file) => set('photoFile', file)}
+        />
+      </Field>
     </div>
   );
 };
@@ -320,25 +327,6 @@ const PurposeCard = ({ active, onClick, label }) => {
     </button>
   );
 };
-
-const PhotoSlot = () => (
-  <button type="button" style={{
-    width: '100%', height: 120, borderRadius: 14,
-    border: `1.5px dashed ${GP.border}`, background: GP.borderSoft,
-    cursor: 'pointer',
-    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6,
-    fontFamily: GP.font,
-  }}>
-    <div style={{
-      width: 44, height: 44, borderRadius: 999, background: GP.greenLight,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-    }}>
-      <Icon name="camera" size={22} color={GP.green} />
-    </div>
-    <div style={{ fontSize: 13, fontWeight: 600, color: GP.text }}>Tomar foto</div>
-    <div style={{ fontSize: 11, color: GP.textSec }}>o seleccionar de galería</div>
-  </button>
-);
 
 const labelOf = (a) => {
   if (!a) return '';

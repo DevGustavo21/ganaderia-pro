@@ -5,6 +5,7 @@ import { GP } from '@/lib/theme';
 import { Icon } from './Icon';
 import { Button, StatusBadge } from './ui';
 import { Modal } from './Modal';
+import { GrowthGalleryModal } from './GrowthGalleryModal';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { isSupabaseConfigured } from '@/lib/supabase/env';
 
@@ -47,6 +48,7 @@ export const AnimalDetail = ({ animal, onClose, onExit, onEdit }) => {
   const isActive = animal?.estado === 'activo';
   const [events, setEvents] = useState(null);
   const [loadingEvents, setLoadingEvents] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
 
   useEffect(() => {
     if (!animal?.id || !isSupabaseConfigured()) {
@@ -99,30 +101,58 @@ export const AnimalDetail = ({ animal, onClose, onExit, onEdit }) => {
           <div style={{
             position: 'relative',
             height: 220, borderRadius: 18,
-            background: `linear-gradient(135deg, ${animal.color || (animal.sexo === 'M' ? '#E9D8C4' : '#D8F3DC')} 0%, ${animal.sexo === 'M' ? '#C9A87D' : '#A7DEC0'} 100%)`,
+            background: animal.photoUrl
+              ? GP.borderSoft
+              : `linear-gradient(135deg, ${animal.color || (animal.sexo === 'M' ? '#E9D8C4' : '#D8F3DC')} 0%, ${animal.sexo === 'M' ? '#C9A87D' : '#A7DEC0'} 100%)`,
             overflow: 'hidden',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <svg width="160" height="160" viewBox="0 0 24 24" fill="none">
-              <path d="M5 8c0-1.5 1-3 2.5-3S10 6 10 8" stroke="rgba(255,255,255,0.6)" strokeWidth="1.2" strokeLinecap="round" />
-              <path d="M14 8c0-1.5 1-3 2.5-3S19 6.5 19 8" stroke="rgba(255,255,255,0.6)" strokeWidth="1.2" strokeLinecap="round" />
-              <path d="M5 8h14v5a7 7 0 0 1-14 0Z" fill="rgba(255,255,255,0.35)" stroke="rgba(255,255,255,0.7)" strokeWidth="1.2" />
-              <circle cx="9.5" cy="11" r="0.7" fill="rgba(255,255,255,0.9)" />
-              <circle cx="14.5" cy="11" r="0.7" fill="rgba(255,255,255,0.9)" />
-              <path d="M10 16c.5 1 1.5 1.5 2 1.5s1.5-.5 2-1.5" stroke="rgba(255,255,255,0.7)" strokeWidth="1.2" strokeLinecap="round" />
-            </svg>
+            {animal.photoUrl ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={animal.photoUrl}
+                alt={`${animal.arete} · ${animal.nombre || ''}`}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
+            ) : (
+              <svg width="160" height="160" viewBox="0 0 24 24" fill="none">
+                <path d="M5 8c0-1.5 1-3 2.5-3S10 6 10 8" stroke="rgba(255,255,255,0.6)" strokeWidth="1.2" strokeLinecap="round" />
+                <path d="M14 8c0-1.5 1-3 2.5-3S19 6.5 19 8" stroke="rgba(255,255,255,0.6)" strokeWidth="1.2" strokeLinecap="round" />
+                <path d="M5 8h14v5a7 7 0 0 1-14 0Z" fill="rgba(255,255,255,0.35)" stroke="rgba(255,255,255,0.7)" strokeWidth="1.2" />
+                <circle cx="9.5" cy="11" r="0.7" fill="rgba(255,255,255,0.9)" />
+                <circle cx="14.5" cy="11" r="0.7" fill="rgba(255,255,255,0.9)" />
+                <path d="M10 16c.5 1 1.5 1.5 2 1.5s1.5-.5 2-1.5" stroke="rgba(255,255,255,0.7)" strokeWidth="1.2" strokeLinecap="round" />
+              </svg>
+            )}
             <div style={{ position: 'absolute', top: 12, left: 12 }}>
               <StatusBadge status={animal.estado} size="md" />
             </div>
-            <div style={{
-              position: 'absolute', bottom: 12, right: 12,
-              background: 'rgba(255,255,255,0.92)', padding: '6px 10px', borderRadius: 999,
-              fontSize: 11, fontWeight: 600, color: GP.text,
-              display: 'flex', alignItems: 'center', gap: 5,
-            }}>
-              <Icon name="camera" size={12} color={GP.textSec} /> Foto placeholder
-            </div>
+            {!animal.photoUrl && (
+              <div style={{
+                position: 'absolute', bottom: 12, right: 12,
+                background: 'rgba(255,255,255,0.92)', padding: '6px 10px', borderRadius: 999,
+                fontSize: 11, fontWeight: 600, color: GP.text,
+                display: 'flex', alignItems: 'center', gap: 5,
+              }}>
+                <Icon name="camera" size={12} color={GP.textSec} /> Foto placeholder
+              </div>
+            )}
           </div>
+
+          <button
+            type="button"
+            onClick={() => setGalleryOpen(true)}
+            style={{
+              width: '100%', marginTop: 10,
+              height: 40, borderRadius: 12,
+              border: `1px solid ${GP.border}`, background: GP.white,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              cursor: 'pointer', fontFamily: GP.font, fontSize: 13, fontWeight: 600, color: GP.greenDeep,
+            }}
+          >
+            <Icon name="chart" size={16} color={GP.green} />
+            Ver crecimiento
+          </button>
 
           <div style={{ marginTop: 14 }}>
             <div style={{ fontSize: 11, fontWeight: 600, color: GP.textSec, letterSpacing: 0.6 }}>
@@ -183,6 +213,13 @@ export const AnimalDetail = ({ animal, onClose, onExit, onEdit }) => {
           )}
         </div>
       </div>
+
+      {galleryOpen && (
+        <GrowthGalleryModal
+          animal={animal}
+          onClose={() => setGalleryOpen(false)}
+        />
+      )}
     </Modal>
   );
 };

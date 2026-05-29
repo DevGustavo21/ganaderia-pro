@@ -12,6 +12,7 @@ import { EmptyFincaState } from '@/components/EmptyFincaState';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { isSupabaseConfigured } from '@/lib/supabase/env';
 import { normalizeAnimal } from '@/lib/normalize';
+import { uploadAndAttachAnimalPhoto } from '@/lib/storage/animalPhotos';
 import {
   registerAnimalAction,
   registerExitAction,
@@ -89,11 +90,26 @@ export const InventarioPageClient = () => {
   const handleRegister = async (data) => {
     setSaving(true);
     const res = await registerAnimalAction({ fincaId: finca.id, data });
-    setSaving(false);
     if (!res.ok) {
+      setSaving(false);
       alert(res.error || 'Error al registrar el animal.');
       return;
     }
+    if (data.photoFile && res.animal?.id) {
+      try {
+        await uploadAndAttachAnimalPhoto({
+          farmId: finca.id,
+          animalId: res.animal.id,
+          file: data.photoFile,
+          weightKg: data.peso ? Number(data.peso) : null,
+          notes: 'Foto inicial',
+        });
+      } catch (err) {
+        console.error('Error subiendo foto:', err);
+        alert('El animal se creó, pero la foto no se pudo subir: ' + (err?.message || err));
+      }
+    }
+    setSaving(false);
     setModal(null);
     loadAnimals();
     router.refresh();
@@ -111,11 +127,26 @@ export const InventarioPageClient = () => {
       motivo: payload.motivo,
       pesoChanged: payload.pesoChanged,
     });
-    setSaving(false);
     if (!res.ok) {
+      setSaving(false);
       alert(res.error || 'Error al actualizar el animal.');
       return;
     }
+    if (payload.photoFile) {
+      try {
+        await uploadAndAttachAnimalPhoto({
+          farmId: finca.id,
+          animalId: selected.id,
+          file: payload.photoFile,
+          weightKg: payload.peso ? Number(payload.peso) : null,
+          notes: 'Actualización',
+        });
+      } catch (err) {
+        console.error('Error subiendo foto:', err);
+        alert('Los cambios se guardaron, pero la foto no se subió: ' + (err?.message || err));
+      }
+    }
+    setSaving(false);
     const list = await loadAnimals();
     const fresh = list.find((a) => a.id === selected.id);
     if (fresh) setSelected(fresh);

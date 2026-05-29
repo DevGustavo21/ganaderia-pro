@@ -6,6 +6,7 @@ import { CATEGORIAS_H, CATEGORIAS_M } from '@/lib/data';
 import { Icon } from './Icon';
 import { Button, Field, Input, Pill } from './ui';
 import { Modal } from './Modal';
+import { PhotoSlot } from './PhotoSlot';
 
 const PROPOSITOS = [
   { key: 'Leche',            color: GP.green,   bg: GP.greenLight, fg: GP.greenDeep, icon: 'droplet' },
@@ -18,6 +19,7 @@ export const EditAnimalForm = ({ animal, saving = false, onClose, onConfirm }) =
   const [categoria, setCategoria] = useState(animal?.categoria || '');
   const [proposito, setProposito] = useState(animal?.proposito || '');
   const [peso, setPeso] = useState(animal?.peso ? String(animal.peso) : '');
+  const [photoFile, setPhotoFile] = useState(null);
 
   const cats = animal?.sexo === 'M' ? CATEGORIAS_M : CATEGORIAS_H;
   const originalPeso = Number(animal?.peso || 0);
@@ -34,6 +36,7 @@ export const EditAnimalForm = ({ animal, saving = false, onClose, onConfirm }) =
       peso: newPeso,
       pesoChanged,
       motivo: pesoChanged ? 'Edición manual' : null,
+      photoFile,
     });
   };
 
@@ -105,6 +108,20 @@ export const EditAnimalForm = ({ animal, saving = false, onClose, onConfirm }) =
             ? `Se registrará un pesaje nuevo · anterior: ${originalPeso} kg`
             : 'Sin cambios desde el último registro'}>
           <Input value={peso} onChange={setPeso} type="number" placeholder="0" suffix="kg" />
+        </Field>
+
+        <Field
+          label="Foto"
+          hint={photoFile
+            ? 'Se guardará como nuevo registro de la galería y reemplazará el placeholder.'
+            : 'Toma una foto nueva para actualizar la imagen del animal y dejar evidencia de su crecimiento.'}
+        >
+          <PhotoSlot
+            value={photoFile}
+            current={animal?.photoUrl || null}
+            onChange={setPhotoFile}
+            label={photoFile ? 'Cambiar foto' : 'Tomar foto'}
+          />
         </Field>
       </div>
 
