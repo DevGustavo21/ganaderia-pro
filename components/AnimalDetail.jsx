@@ -41,6 +41,28 @@ const rowToTimelineEvent = (row, animal) => {
       monto: row.exit_amount != null ? Number(row.exit_amount) : null,
     };
   }
+  if (row.type === 'nota') {
+    const md = row.metadata || {};
+    if (md.kind === 'foto') {
+      return {
+        ...base,
+        tipo: 'foto',
+        url: md.url || null,
+        weight_kg: md.weight_kg != null ? Number(md.weight_kg) : null,
+        detalle: row.description || 'Nueva foto agregada al historial',
+        notes: md.notes || null,
+      };
+    }
+    if (md.kind === 'actualizacion') {
+      return {
+        ...base,
+        tipo: 'actualizacion',
+        changes: Array.isArray(md.changes) ? md.changes : [],
+        summary: row.description || '',
+      };
+    }
+    return { ...base, detalle: row.description || '' };
+  }
   return { ...base, detalle: row.description || '' };
 };
 
@@ -244,13 +266,15 @@ const Timeline = ({ events }) => (
 
 const TimelineEvent = ({ event, last }) => {
   const metaMap = {
-    ingreso:     { color: GP.green, bg: GP.greenLight, label: 'Ingreso',     icon: 'arrowUp' },
-    pesaje:      { color: GP.amber, bg: GP.amberLight, label: 'Pesaje',      icon: 'weight' },
-    salida:      { color: GP.red,   bg: GP.redLight,   label: 'Salida',      icon: 'arrowOut' },
-    traslado:    { color: '#3B82F6', bg: '#DBEAFE',    label: 'Traslado',    icon: 'sync' },
-    tratamiento: { color: '#8B5CF6', bg: '#F3E8FF',    label: 'Tratamiento', icon: 'droplet' },
-    parto:       { color: GP.green,  bg: GP.greenLight, label: 'Parto',      icon: 'cow' },
-    nota:        { color: GP.textSec, bg: GP.borderSoft, label: 'Nota',      icon: 'info' },
+    ingreso:       { color: GP.green,   bg: GP.greenLight, label: 'Ingreso',       icon: 'arrowUp' },
+    pesaje:        { color: GP.amber,   bg: GP.amberLight, label: 'Pesaje',        icon: 'weight' },
+    salida:        { color: GP.red,     bg: GP.redLight,   label: 'Salida',        icon: 'arrowOut' },
+    traslado:      { color: '#3B82F6',  bg: '#DBEAFE',     label: 'Traslado',      icon: 'sync' },
+    tratamiento:   { color: '#8B5CF6',  bg: '#F3E8FF',     label: 'Tratamiento',   icon: 'droplet' },
+    parto:         { color: GP.green,   bg: GP.greenLight, label: 'Parto',         icon: 'cow' },
+    nota:          { color: GP.textSec, bg: GP.borderSoft, label: 'Nota',          icon: 'info' },
+    foto:          { color: '#8B5CF6',  bg: '#F3E8FF',     label: 'Foto',          icon: 'camera' },
+    actualizacion: { color: '#3B82F6',  bg: '#DBEAFE',     label: 'Actualización', icon: 'settings' },
   };
   const meta = metaMap[event.tipo] || { color: GP.textSec, bg: GP.borderSoft, label: 'Evento', icon: 'dot' };
   return (
@@ -305,7 +329,66 @@ const TimelineEvent = ({ event, last }) => {
             {event.monto != null && <div style={{ fontSize: 12, color: GP.textSec, marginTop: 2 }}>Monto: <strong style={{ color: GP.text }}>{fmtMoney(event.monto)}</strong></div>}
           </>
         )}
-        {event.tipo !== 'pesaje' && event.tipo !== 'ingreso' && event.tipo !== 'salida' && event.detalle && (
+        {event.tipo === 'foto' && (
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 4 }}>
+            {event.url && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={event.url}
+                alt="Foto"
+                style={{
+                  width: 56, height: 56, borderRadius: 10, objectFit: 'cover',
+                  border: `1px solid ${GP.border}`, flexShrink: 0,
+                }}
+              />
+            )}
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: GP.text }}>
+                {event.detalle || 'Nueva foto'}
+              </div>
+              {(event.weight_kg != null || event.notes) && (
+                <div style={{ fontSize: 12, color: GP.textSec, marginTop: 2 }}>
+                  {event.weight_kg != null && <>Peso registrado: <strong style={{ color: GP.text }}>{event.weight_kg} kg</strong></>}
+                  {event.weight_kg != null && event.notes && ' · '}
+                  {event.notes}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        {event.tipo === 'actualizacion' && (
+          <>
+            {event.changes && event.changes.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 2 }}>
+                {event.changes.map((c, idx) => (
+                  <div key={idx} style={{ fontSize: 12, color: GP.text, display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'baseline' }}>
+                    <span style={{ fontWeight: 600, color: GP.textSec }}>{c.label || c.field}:</span>
+                    <span style={{
+                      padding: '1px 6px', borderRadius: 6,
+                      background: GP.borderSoft, color: GP.textSec,
+                      fontSize: 11, textDecoration: 'line-through',
+                    }}>
+                      {c.from ?? '—'}
+                    </span>
+                    <Icon name="chevR" size={11} color={GP.textSec} />
+                    <span style={{
+                      padding: '1px 6px', borderRadius: 6,
+                      background: '#DBEAFE', color: '#1E3A8A',
+                      fontSize: 11, fontWeight: 600,
+                    }}>
+                      {c.to ?? '—'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : event.summary ? (
+              <div style={{ fontSize: 12, color: GP.text, marginTop: 2 }}>{event.summary}</div>
+            ) : null}
+          </>
+        )}
+        {event.tipo !== 'pesaje' && event.tipo !== 'ingreso' && event.tipo !== 'salida'
+          && event.tipo !== 'foto' && event.tipo !== 'actualizacion'
+          && event.detalle && (
           <div style={{ fontSize: 12, color: GP.text, marginTop: 2 }}>{event.detalle}</div>
         )}
       </div>

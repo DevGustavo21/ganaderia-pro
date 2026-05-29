@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { createAnimal, addWeighEvent, registerExit, updateAnimal } from '@/lib/db/animals';
+import { createAnimal, addWeighEvent, registerExit, updateAnimal, getAnimal, logChange } from '@/lib/db/animals';
 
 // Mapeo de las claves del wizard (UI) → columnas de la BD.
 const toRow = (input, fincaId) => {
@@ -56,25 +56,57 @@ export const updateAnimalDetailsAction = async ({
   if (!animalId) return { ok: false, error: 'Animal inválido.' };
   if (!farmId)   return { ok: false, error: 'Finca inválida.' };
   try {
+    const current = await getAnimal(animalId);
     const weightKg = peso != null && peso !== '' ? Number(peso) : null;
 
+    const trackedChanges = [];
+    if (categoria && categoria !== current.category) {
+      trackedChanges.push({
+        field: 'categoria', label: 'Categoría',
+        from: current.category || null, to: categoria,
+      });
+    }
+    if (proposito && proposito !== current.purpose) {
+      trackedChanges.push({
+        field: 'proposito', label: 'Propósito',
+        from: current.purpose || null, to: proposito,
+      });
+    }
+
+    // Peso: el evento `pesaje` ya queda registrado por addWeighEvent,
+    // no lo duplicamos en la lista de cambios.
     if (pesoChanged && weightKg && weightKg > 0) {
       await addWeighEvent({
         animalId,
         farmId,
         weightKg,
-        reason: motivo || 'Ajuste manual',
+        reason: motivo || 'Edición manual',
         date: new Date().toISOString().slice(0, 10),
       });
     }
 
     const patch = {};
-    if (categoria) patch.category = categoria;
-    if (proposito) patch.purpose = proposito;
-    if (!pesoChanged && weightKg && weightKg > 0) patch.current_weight_kg = weightKg;
+    if (categoria && categoria !== current.category) patch.category = categoria;
+    if (proposito && proposito !== current.purpose) patch.purpose = proposito;
+    if (!pesoChanged && weightKg && weightKg > 0 && weightKg !== Number(current.current_weight_kg || 0)) {
+      patch.current_weight_kg = weightKg;
+    }
 
     if (Object.keys(patch).length) {
       await updateAnimal(animalId, patch);
+    }
+
+    if (trackedChanges.length > 0) {
+      const summary = trackedChanges
+        .map((c) => `${c.label}: ${c.from || '—'} → ${c.to || '—'}`)
+        .join(' · ');
+      await logChange({
+        animalId,
+        farmId,
+        kind: 'actualizacion',
+        changes: trackedChanges,
+        summary,
+      });
     }
 
     revalidatePath('/inventario');
