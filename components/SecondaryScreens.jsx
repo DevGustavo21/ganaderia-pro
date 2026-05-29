@@ -16,8 +16,15 @@ export const FincasScreen = ({
   onOpenFinca,
   onSwitchFinca,
   onCreateFinca,
+  onInviteCollaborator = null,
+  onInviteToFarm = null,
+  manageableFarmIds = null,
   collaboratorsSlot = null,
 }) => {
+  const manageableSet = manageableFarmIds instanceof Set
+    ? manageableFarmIds
+    : new Set(manageableFarmIds || []);
+  const canInviteAny = manageableSet.size > 0 && typeof onInviteToFarm === 'function';
   if (fincas.length === 0) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -75,13 +82,25 @@ export const FincasScreen = ({
             inventario, lotes y personal independientes.
           </p>
         </div>
-        <Button
-          variant="primary"
-          onClick={onCreateFinca}
-          icon={<Icon name="plus" size={16} color="#fff" strokeWidth={2.2} />}
-        >
-          Crear finca
-        </Button>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {canInviteAny && (
+            <Button
+              variant="outline"
+              onClick={() => onInviteToFarm(null)}
+              icon={<Icon name="user" size={16} color={GP.green} strokeWidth={2.2} />}
+              style={{ color: GP.green, borderColor: GP.border }}
+            >
+              Invitar colaborador
+            </Button>
+          )}
+          <Button
+            variant="primary"
+            onClick={onCreateFinca}
+            icon={<Icon name="plus" size={16} color="#fff" strokeWidth={2.2} />}
+          >
+            Crear finca
+          </Button>
+        </div>
       </header>
 
       {/* Selector horizontal de fincas */}
@@ -126,6 +145,7 @@ export const FincasScreen = ({
           lots={lots}
           personnel={personnel}
           collaboratorsSlot={collaboratorsSlot}
+          onInviteCollaborator={onInviteCollaborator}
         />
       ) : (
         <div
@@ -155,18 +175,27 @@ export const FincasScreen = ({
           {fincas.map(f => {
             const fm = counts[f.id] || { activos: 0 };
             const isActive = f.id === activa?.id;
+            const canInviteHere = manageableSet.has(f.id) && typeof onInviteToFarm === 'function';
+            const openFinca = () => onOpenFinca?.(f);
             return (
-              <button
+              <div
                 key={f.id}
-                type="button"
-                onClick={() => onOpenFinca?.(f)}
+                role="button"
+                tabIndex={0}
+                onClick={openFinca}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openFinca();
+                  }
+                }}
                 style={{
                   textAlign: 'left',
                   background: GP.white,
                   border: `1.5px solid ${isActive ? GP.green : GP.border}`,
                   borderRadius: 14, padding: 14,
                   cursor: 'pointer', fontFamily: GP.font,
-                  display: 'flex', flexDirection: 'column', gap: 8,
+                  display: 'flex', flexDirection: 'column', gap: 10,
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -198,10 +227,33 @@ export const FincasScreen = ({
                     </span>
                   )}
                 </div>
-                <div style={{ display: 'flex', gap: 12, fontSize: 12, color: GP.textSec }}>
+                <div style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  gap: 8, fontSize: 12, color: GP.textSec,
+                }}>
                   <span><strong style={{ color: GP.text }}>{fm.activos}</strong> animales</span>
+                  {canInviteHere && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onInviteToFarm(f);
+                      }}
+                      title={`Invitar colaborador a ${f.nombre}`}
+                      style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 5,
+                        padding: '4px 9px', borderRadius: 999,
+                        border: `1px solid ${GP.border}`, background: GP.white,
+                        color: GP.green, fontFamily: GP.font,
+                        fontSize: 11, fontWeight: 700, cursor: 'pointer',
+                      }}
+                    >
+                      <Icon name="user" size={12} color={GP.green} strokeWidth={2.4} />
+                      Invitar
+                    </button>
+                  )}
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>
@@ -210,7 +262,10 @@ export const FincasScreen = ({
   );
 };
 
-const ActiveFincaDetail = ({ activa, metrics, lots = [], personnel = [], collaboratorsSlot = null }) => {
+const ActiveFincaDetail = ({
+  activa, metrics, lots = [], personnel = [],
+  collaboratorsSlot = null, onInviteCollaborator = null,
+}) => {
   const m = metrics || { activos: 0, hembras: 0, machos: 0 };
   return (
     <>
@@ -221,12 +276,33 @@ const ActiveFincaDetail = ({ activa, metrics, lots = [], personnel = [], collabo
           boxShadow: '0 12px 32px rgba(27,67,50,0.18)',
         }}
       >
-        <div style={{ fontSize: 11, fontWeight: 700, opacity: 0.8, letterSpacing: 0.6, textTransform: 'uppercase' }}>
-          Finca activa
-        </div>
-        <div style={{ fontSize: 24, fontWeight: 700, marginTop: 4, letterSpacing: -0.3 }}>{activa.nombre}</div>
-        <div style={{ fontSize: 13, opacity: 0.85, marginTop: 4 }}>
-          {activa.ubicacion} · {activa.hectareas} ha · Propósito: {activa.proposito}
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
+          <div style={{ flex: 1, minWidth: 220 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, opacity: 0.8, letterSpacing: 0.6, textTransform: 'uppercase' }}>
+              Finca activa
+            </div>
+            <div style={{ fontSize: 24, fontWeight: 700, marginTop: 4, letterSpacing: -0.3 }}>{activa.nombre}</div>
+            <div style={{ fontSize: 13, opacity: 0.85, marginTop: 4 }}>
+              {activa.ubicacion} · {activa.hectareas} ha · Propósito: {activa.proposito}
+            </div>
+          </div>
+          {onInviteCollaborator && (
+            <button
+              type="button"
+              onClick={onInviteCollaborator}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                padding: '10px 14px', height: 40,
+                background: 'rgba(255,255,255,0.18)',
+                color: '#fff', border: '1px solid rgba(255,255,255,0.35)',
+                borderRadius: 10, fontFamily: GP.font, fontSize: 13, fontWeight: 600,
+                cursor: 'pointer', backdropFilter: 'blur(6px)', flexShrink: 0,
+              }}
+            >
+              <Icon name="plus" size={14} color="#fff" strokeWidth={2.2} />
+              Invitar colaborador
+            </button>
+          )}
         </div>
         <div
           style={{

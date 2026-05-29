@@ -5,6 +5,7 @@ import { GP } from '@/lib/theme';
 import { Icon } from './Icon';
 import { Button } from './ui';
 import { InviteCollaboratorModal } from './InviteCollaboratorModal';
+import { ConfirmModal } from './ConfirmModal';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { isSupabaseConfigured } from '@/lib/supabase/env';
 import {
@@ -40,12 +41,28 @@ const initials = (name = '') =>
 
 const ROLE_OPTIONS_ASSIGNABLE = ['editor', 'lector', 'admin'];
 
-export const CollaboratorsPanel = ({ farm, currentUserId }) => {
+export const CollaboratorsPanel = ({
+  farm,
+  currentUserId,
+  inviteOpen,
+  onInviteOpenChange,
+  onRoleResolved,
+}) => {
   const [members, setMembers] = useState([]);
   const [invitations, setInvitations] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showInvite, setShowInvite] = useState(false);
+  const [internalInviteOpen, setInternalInviteOpen] = useState(false);
   const [busy, setBusy] = useState(null);
+  const [removeTarget, setRemoveTarget] = useState(null);
+  const [revokeTarget, setRevokeTarget] = useState(null);
+  const [alertDialog, setAlertDialog] = useState(null);
+
+  const isControlled = inviteOpen !== undefined;
+  const showInvite = isControlled ? inviteOpen : internalInviteOpen;
+  const setShowInvite = (open) => {
+    if (isControlled) onInviteOpenChange?.(open);
+    else setInternalInviteOpen(open);
+  };
 
   const load = useCallback(async () => {
     if (!farm?.id || !isSupabaseConfigured()) {
@@ -87,6 +104,10 @@ export const CollaboratorsPanel = ({ farm, currentUserId }) => {
   const myRole = myMember?.role || null;
   const canAdminister = myRole === 'owner' || myRole === 'admin';
 
+  useEffect(() => {
+    onRoleResolved?.({ role: myRole, canAdminister });
+  }, [myRole, canAdminister, onRoleResolved]);
+
   const handleChangeRole = async (member, newRole) => {
     if (member.role === 'owner') return;
     if (newRole === member.role) return;
@@ -94,32 +115,44 @@ export const CollaboratorsPanel = ({ farm, currentUserId }) => {
     const res = await changeMemberRoleAction({ farmId: farm.id, userId: member.user_id, role: newRole });
     setBusy(null);
     if (!res.ok) {
-      alert(res.error || 'Error al cambiar rol.');
+      setAlertDialog({
+        title: 'No se pudo cambiar el rol',
+        description: res.error || 'Ocurrió un error inesperado. Intenta nuevamente.',
+      });
       return;
     }
     await load();
   };
 
-  const handleRemove = async (member) => {
-    if (member.role === 'owner') return;
-    if (!confirm(`¿Quitar a ${member.profiles?.full_name || member.profiles?.email || 'este colaborador'} de la finca?`)) return;
+  const confirmRemove = async () => {
+    if (!removeTarget) return;
+    const member = removeTarget;
     setBusy(`remove-${member.user_id}`);
     const res = await removeMemberAction({ farmId: farm.id, userId: member.user_id });
     setBusy(null);
+    setRemoveTarget(null);
     if (!res.ok) {
-      alert(res.error || 'Error al eliminar.');
+      setAlertDialog({
+        title: 'No se pudo eliminar',
+        description: res.error || 'Ocurrió un error inesperado al quitar al colaborador.',
+      });
       return;
     }
     await load();
   };
 
-  const handleRevoke = async (invitation) => {
-    if (!confirm('¿Revocar esta invitación? El link dejará de funcionar.')) return;
+  const confirmRevoke = async () => {
+    if (!revokeTarget) return;
+    const invitation = revokeTarget;
     setBusy(`revoke-${invitation.id}`);
     const res = await revokeInvitationAction({ invitationId: invitation.id });
     setBusy(null);
+    setRevokeTarget(null);
     if (!res.ok) {
-      alert(res.error || 'Error al revocar.');
+      setAlertDialog({
+        title: 'No se pudo revocar',
+        description: res.error || 'Ocurrió un error inesperado al revocar la invitación.',
+      });
       return;
     }
     await load();
@@ -268,7 +301,7 @@ export const CollaboratorsPanel = ({ farm, currentUserId }) => {
                 {canEditThis && (
                   <button
                     type="button"
-                    onClick={() => handleRemove(m)}
+                    onClick={() => setRemoveTarget(m)}
                     disabled={busyKey}
                     title="Quitar de la finca"
                     style={{
@@ -356,7 +389,7 @@ export const CollaboratorsPanel = ({ farm, currentUserId }) => {
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleRevoke(inv)}
+                        onClick={() => setRevokeTarget(inv)}
                         disabled={busy === `revoke-${inv.id}`}
                         title="Revocar invitación"
                         style={{
@@ -381,6 +414,40 @@ export const CollaboratorsPanel = ({ farm, currentUserId }) => {
           farmName={farm.nombre}
           onClose={() => setShowInvite(false)}
           onInvited={() => { load(); }}
+        />
+      )}
+
+      {removeTarget && (
+        <ConfirmModal
+          variant="danger"
+          title="Quitar colaborador"
+          description="Esta persona perderá acceso a la finca de inmediato. Podrás volver a invitarla cuando quieras."
+          details={removeTarget.profiles?.full_name || removeTarget.profiles?.email || 'Colaborador'}
+          confirmLabel="Quitar de la finca"
+          onConfirm={confirmRemove}
+          onClose={() => setRemoveTarget(null)}
+        />
+      )}
+
+      {revokeTarget && (
+        <ConfirmModal
+          variant="warn"
+          title="Revocar invitación"
+          description="El link dejará de funcionar y la persona ya no podrá usarlo para unirse a la finca."
+          details={revokeTarget.email || 'Link abierto sin destinatario'}
+          confirmLabel="Revocar invitación"
+          onConfirm={confirmRevoke}
+          onClose={() => setRevokeTarget(null)}
+        />
+      )}
+
+      {alertDialog && (
+        <ConfirmModal
+          variant="danger"
+          mode="alert"
+          title={alertDialog.title}
+          description={alertDialog.description}
+          onClose={() => setAlertDialog(null)}
         />
       )}
     </section>

@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { GP } from '@/lib/theme';
 import { Icon } from './Icon';
-import { Button, Field, Input, Textarea } from './ui';
+import { Button, Field, Input, Select, Textarea } from './ui';
 import { Modal } from './Modal';
 import { createInvitationAction } from '@/app/actions/farms';
 
@@ -28,7 +28,20 @@ const ROLE_OPTIONS = [
   },
 ];
 
-export const InviteCollaboratorModal = ({ farmId, farmName, onClose, onInvited }) => {
+// `farms` (opcional): si se pasa una lista de fincas, el modal muestra un
+// selector para elegir a cuál mandar la invitación. Si solo se pasa
+// `farmId`/`farmName`, va fija a esa finca.
+export const InviteCollaboratorModal = ({
+  farmId,
+  farmName,
+  farms = null,
+  onClose,
+  onInvited,
+}) => {
+  const showFarmSelector = Array.isArray(farms) && farms.length > 0;
+  const [selectedFarmId, setSelectedFarmId] = useState(
+    farmId || (showFarmSelector ? farms[0].id : '')
+  );
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('editor');
   const [message, setMessage] = useState('');
@@ -37,10 +50,30 @@ export const InviteCollaboratorModal = ({ farmId, farmName, onClose, onInvited }
   const [created, setCreated] = useState(null);
   const [copied, setCopied] = useState(false);
 
+  const farmOptions = useMemo(
+    () => (showFarmSelector ? farms.map((f) => f.nombre || f.name) : []),
+    [farms, showFarmSelector]
+  );
+  const selectedFarmName = useMemo(() => {
+    if (showFarmSelector) {
+      return farms.find((f) => f.id === selectedFarmId)?.nombre || farmOptions[0] || '';
+    }
+    return farmName || 'Finca';
+  }, [showFarmSelector, farms, selectedFarmId, farmOptions, farmName]);
+
   const submit = async () => {
     setError(null);
+    if (!selectedFarmId) {
+      setError('Selecciona una finca antes de generar la invitación.');
+      return;
+    }
     setSaving(true);
-    const res = await createInvitationAction({ farmId, email: email || null, role, message: message || null });
+    const res = await createInvitationAction({
+      farmId: selectedFarmId,
+      email: email || null,
+      role,
+      message: message || null,
+    });
     setSaving(false);
     if (!res.ok) {
       setError(res.error || 'No se pudo crear la invitación.');
@@ -81,7 +114,7 @@ export const InviteCollaboratorModal = ({ farmId, farmName, onClose, onInvited }
         <div style={{ flex: 1 }}>
           <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: GP.text }}>Invitar colaborador</h2>
           <div style={{ fontSize: 12, color: GP.textSec, marginTop: 1 }}>
-            {farmName || 'Finca'}
+            {selectedFarmName}
           </div>
         </div>
         <button type="button" onClick={onClose} style={{
@@ -96,6 +129,20 @@ export const InviteCollaboratorModal = ({ farmId, farmName, onClose, onInvited }
       <div style={{ flex: 1, overflowY: 'auto', padding: '18px 20px 8px', display: 'flex', flexDirection: 'column', gap: 16 }}>
         {!created && (
           <>
+            {showFarmSelector && (
+              <Field label="Finca" required hint="Solo se listan las fincas donde tienes permiso de administración.">
+                <Select
+                  value={selectedFarmName}
+                  options={farmOptions}
+                  placeholder="Selecciona una finca"
+                  onChange={(name) => {
+                    const found = farms.find((f) => (f.nombre || f.name) === name);
+                    if (found) setSelectedFarmId(found.id);
+                  }}
+                />
+              </Field>
+            )}
+
             <Field label="Rol del colaborador" required>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 10 }}>
                 {ROLE_OPTIONS.map((r) => {

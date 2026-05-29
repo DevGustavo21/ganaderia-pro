@@ -1,13 +1,16 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFinca } from '@/components/FincaProvider';
 import { FincasScreen } from '@/components/SecondaryScreens';
 import { CreateFincaModal } from '@/components/CreateFincaModal';
 import { CollaboratorsPanel } from '@/components/CollaboratorsPanel';
+import { InviteCollaboratorModal } from '@/components/InviteCollaboratorModal';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { isSupabaseConfigured } from '@/lib/supabase/env';
+
+const ADMIN_ROLES = new Set(['owner', 'admin']);
 
 export const FincasPageClient = () => {
   const router = useRouter();
@@ -17,6 +20,18 @@ export const FincasPageClient = () => {
   const [lots, setLots] = useState([]);
   const [personnel, setPersonnel] = useState([]);
   const [showCreate, setShowCreate] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [myRoleInfo, setMyRoleInfo] = useState({ role: null, canAdminister: false });
+
+  // Memberships del usuario en todas sus fincas (mapa farmId → role).
+  const [membershipRoles, setMembershipRoles] = useState({});
+
+  // Modal global de invitación (independiente del CollaboratorsPanel),
+  // usado desde el botón del header y desde las cards. Puede preseleccionar
+  // una finca o mostrar selector si se pasa null.
+  const [globalInvite, setGlobalInvite] = useState(null);
+  // Bump para que el CollaboratorsPanel recargue al invitar desde fuera.
+  const [panelRefreshKey, setPanelRefreshKey] = useState(0);
 
   // Cargar conteos por finca.
   useEffect(() => {
@@ -75,6 +90,63 @@ export const FincasPageClient = () => {
     loadDetails();
   }, [loadDetails]);
 
+  // Cargar mis roles en cada finca.
+  useEffect(() => {
+    if (!isSupabaseConfigured() || !user?.id || fincas.length === 0) {
+      setMembershipRoles({});
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const supabase = supabaseBrowser();
+        const { data, error } = await supabase
+          .from('farm_members')
+          .select('farm_id, role')
+          .eq('user_id', user.id)
+          .in('farm_id', fincas.map(f => f.id));
+        if (error) throw error;
+        if (cancelled) return;
+        const map = {};
+        for (const row of data ?? []) map[row.farm_id] = row.role;
+        setMembershipRoles(map);
+      } catch (err) {
+        console.error('Error cargando memberships:', err);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?.id, fincas]);
+
+  const manageableFarms = useMemo(
+    () => fincas.filter(f => ADMIN_ROLES.has(membershipRoles[f.id])),
+    [fincas, membershipRoles]
+  );
+  const manageableFarmIds = useMemo(
+    () => new Set(manageableFarms.map(f => f.id)),
+    [manageableFarms]
+  );
+
+  const handleInviteToFarm = (targetFarm) => {
+    if (targetFarm) {
+      setGlobalInvite({
+        farmId: targetFarm.id,
+        farmName: targetFarm.nombre,
+        farms: null,
+      });
+    } else if (manageableFarms.length === 1) {
+      const only = manageableFarms[0];
+      setGlobalInvite({ farmId: only.id, farmName: only.nombre, farms: null });
+    } else {
+      setGlobalInvite({ farmId: null, farmName: null, farms: manageableFarms });
+    }
+  };
+
+  const handleInvited = (invitation) => {
+    if (invitation?.farm_id && finca?.id === invitation.farm_id) {
+      setPanelRefreshKey((k) => k + 1);
+    }
+  };
+
   return (
     <>
       <FincasScreen
@@ -89,8 +161,20 @@ export const FincasPageClient = () => {
           router.push('/inventario');
         }}
         onCreateFinca={() => setShowCreate(true)}
+        onInviteCollaborator={
+          finca && myRoleInfo.canAdminister ? () => setInviteOpen(true) : null
+        }
+        onInviteToFarm={manageableFarms.length > 0 ? handleInviteToFarm : null}
+        manageableFarmIds={manageableFarmIds}
         collaboratorsSlot={finca ? (
-          <CollaboratorsPanel farm={finca} currentUserId={user?.id} />
+          <CollaboratorsPanel
+            key={`panel-${finca.id}-${panelRefreshKey}`}
+            farm={finca}
+            currentUserId={user?.id}
+            inviteOpen={inviteOpen}
+            onInviteOpenChange={setInviteOpen}
+            onRoleResolved={setMyRoleInfo}
+          />
         ) : null}
       />
 
@@ -102,6 +186,16 @@ export const FincasPageClient = () => {
             setFincaId(farm.id);
             router.refresh();
           }}
+        />
+      )}
+
+      {globalInvite && (
+        <InviteCollaboratorModal
+          farmId={globalInvite.farmId}
+          farmName={globalInvite.farmName}
+          farms={globalInvite.farms}
+          onClose={() => setGlobalInvite(null)}
+          onInvited={handleInvited}
         />
       )}
     </>
