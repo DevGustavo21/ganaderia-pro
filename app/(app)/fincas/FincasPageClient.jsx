@@ -5,12 +5,13 @@ import { useRouter } from 'next/navigation';
 import { useFinca } from '@/components/FincaProvider';
 import { FincasScreen } from '@/components/SecondaryScreens';
 import { CreateFincaModal } from '@/components/CreateFincaModal';
+import { CollaboratorsPanel } from '@/components/CollaboratorsPanel';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { isSupabaseConfigured } from '@/lib/supabase/env';
 
 export const FincasPageClient = () => {
   const router = useRouter();
-  const { finca, fincas, setFincaId } = useFinca();
+  const { finca, fincas, setFincaId, user } = useFinca();
 
   const [counts, setCounts] = useState({});
   const [lots, setLots] = useState([]);
@@ -88,6 +89,9 @@ export const FincasPageClient = () => {
           router.push('/inventario');
         }}
         onCreateFinca={() => setShowCreate(true)}
+        collaboratorsSlot={finca ? (
+          <CollaboratorsPanel farm={finca} currentUserId={user?.id} />
+        ) : null}
       />
 
       {showCreate && (

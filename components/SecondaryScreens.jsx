@@ -16,6 +16,7 @@ export const FincasScreen = ({
   onOpenFinca,
   onSwitchFinca,
   onCreateFinca,
+  collaboratorsSlot = null,
 }) => {
   if (fincas.length === 0) {
     return (
@@ -124,6 +125,7 @@ export const FincasScreen = ({
           metrics={counts[activa.id]}
           lots={lots}
           personnel={personnel}
+          collaboratorsSlot={collaboratorsSlot}
         />
       ) : (
         <div
@@ -208,7 +210,7 @@ export const FincasScreen = ({
   );
 };
 
-const ActiveFincaDetail = ({ activa, metrics, lots = [], personnel = [] }) => {
+const ActiveFincaDetail = ({ activa, metrics, lots = [], personnel = [], collaboratorsSlot = null }) => {
   const m = metrics || { activos: 0, hembras: 0, machos: 0 };
   return (
     <>
@@ -284,8 +286,8 @@ const ActiveFincaDetail = ({ activa, metrics, lots = [], personnel = [] }) => {
 
         <section>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <h3 style={SECTION_TITLE_STYLE}>Personal</h3>
-            <span style={{ fontSize: 12, color: GP.textSec }}>{personnel.length} trabajadores</span>
+            <h3 style={SECTION_TITLE_STYLE}>Personal externo</h3>
+            <span style={{ fontSize: 12, color: GP.textSec }}>{personnel.length} registrados</span>
           </div>
           <div
             style={{
@@ -328,6 +330,8 @@ const ActiveFincaDetail = ({ activa, metrics, lots = [], personnel = [] }) => {
           </div>
         </section>
       </div>
+
+      {collaboratorsSlot}
     </>
   );
 };
