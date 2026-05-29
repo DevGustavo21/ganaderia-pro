@@ -1,0 +1,394 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ───── Hero ───── */
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px;
+  border-radius: 20px;
+  background:
+    radial-gradient(120% 80% at 80% 0%, rgba(82, 183, 136, 0.30) 0%, transparent 60%),
+    linear-gradient(135deg, var(--gp-green-deep) 0%, var(--gp-green) 100%);
+  color: #fff;
+  box-shadow: 0 18px 40px rgba(27, 67, 50, 0.18);
+}
+.heroText { min-width: 0; }
+.kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  opacity: 0.78;
+}
+.title {
+  margin: 6px 0 6px;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  line-height: 1.2;
+}
+.titleAccent {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  padding: 0 8px;
+}
+.lead {
+  margin: 0;
+  font-size: 13.5px;
+  opacity: 0.88;
+  line-height: 1.5;
+  max-width: 540px;
+}
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.heroActions :global(button) {
+  flex: 1 1 auto;
+}
+
+/* ───── KPIs ───── */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.kpiCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid var(--gp-border);
+  border-radius: 14px;
+}
+.kpiIcon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.kpiBody { min-width: 0; }
+.kpiLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gp-text-sec);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.kpiValueRow {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: 2px;
+}
+.kpiValue {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+.kpiSub {
+  font-size: 11px;
+  color: var(--gp-text-sec);
+  font-weight: 500;
+}
+
+/* ───── Section heads ───── */
+.sectionHead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.sectionTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: var(--gp-text);
+}
+.sectionSub {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--gp-text-sec);
+}
+.linkBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gp-green);
+  padding: 4px 6px;
+  border-radius: 8px;
+}
+.linkBtn:hover { background: var(--gp-green-light); }
+
+/* ───── Finca cards ───── */
+.fincaGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+.fincaCard {
+  background: #fff;
+  border: 1px solid var(--gp-border);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+.fincaCard:hover {
+  border-color: #cfe4d6;
+  box-shadow: 0 10px 24px rgba(27, 67, 50, 0.08);
+}
+.fincaCardActive {
+  border-color: var(--gp-green);
+  box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.10);
+}
+.fincaBanner {
+  position: relative;
+  height: 88px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 12px 14px;
+  color: #fff;
+}
+.fincaBadgeRow {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: space-between;
+}
+.activeBadge,
+.purposeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.activeBadge { background: rgba(0, 0, 0, 0.30); }
+.purposeBadge { margin-left: auto; }
+
+.fincaBody {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+.fincaName {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gp-text);
+  letter-spacing: -0.2px;
+}
+.fincaMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--gp-text-sec);
+}
+.dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--gp-text-sec);
+  opacity: 0.5;
+}
+
+.fincaStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 10px;
+  background: var(--gp-bg);
+  border-radius: 10px;
+}
+.statCol { text-align: center; }
+.statValue {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gp-text);
+  line-height: 1;
+}
+.statLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--gp-text-sec);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.fincaFoot {
+  margin-top: auto;
+}
+
+/* Add card */
+.addCard {
+  background: transparent;
+  border: 1.5px dashed var(--gp-border);
+  border-radius: 16px;
+  padding: 28px 16px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  font-family: inherit;
+  color: var(--gp-text-sec);
+  transition: border-color .15s ease, background .15s ease;
+}
+.addCard:hover {
+  border-color: var(--gp-green);
+  background: var(--gp-green-light);
+}
+.addIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: var(--gp-green-light);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 4px;
+}
+.addTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gp-text);
+}
+.addSub {
+  font-size: 12px;
+  color: var(--gp-text-sec);
+  max-width: 220px;
+}
+
+/* ───── Activity list ───── */
+.activityList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid var(--gp-border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.activityItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--gp-border);
+}
+.activityItem:last-child { border-bottom: none; }
+.activityIcon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.activityBody { flex: 1; min-width: 0; }
+.activityTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gp-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.activityMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--gp-text-sec);
+  margin-top: 2px;
+}
+.activityMeta > span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.activityDate {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gp-text-sec);
+  flex-shrink: 0;
+}
+
+/* ───── Tablet ───── */
+@media (min-width: 600px) {
+  .hero {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 32px;
+  }
+  .heroActions {
+    flex-direction: column;
+    align-items: stretch;
+    min-width: 220px;
+  }
+  .heroActions :global(button) { flex: 0 0 auto; }
+  .title { font-size: 28px; }
+
+  .kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .fincaGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ───── Desktop ───── */
+@media (min-width: 1024px) {
+  .wrap { gap: 32px; }
+  .hero { padding: 36px 40px; }
+  .title { font-size: 32px; }
+  .lead { font-size: 14.5px; }
+
+  .kpis {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .fincaGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .sectionTitle { font-size: 20px; }
+}

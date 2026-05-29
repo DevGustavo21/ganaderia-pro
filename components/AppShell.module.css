@@ -1,0 +1,397 @@
+.shell {
+  min-height: 100dvh;
+  display: flex;
+  background: var(--gp-bg);
+  color: var(--gp-text);
+}
+
+/* ───── Sidebar (desktop ≥1024) ───── */
+.sidebar {
+  display: none;
+  width: 248px;
+  flex-shrink: 0;
+  background: #fff;
+  border-right: 1px solid var(--gp-border);
+  padding: 22px 14px 18px;
+  flex-direction: column;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px 18px;
+  border-bottom: 1px solid var(--gp-border);
+  margin-bottom: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+.brandMark {
+  width: 40px; height: 40px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--gp-green) 0%, var(--gp-green-deep) 100%);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(45, 106, 79, 0.25);
+}
+.brandName {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--gp-text);
+  letter-spacing: -0.2px;
+  line-height: 1.1;
+}
+.brandSub {
+  font-size: 11px;
+  color: var(--gp-green);
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+.navItem {
+  height: 44px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 14px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gp-text-sec);
+  text-align: left;
+  transition: background .15s ease, color .15s ease;
+  text-decoration: none;
+}
+.navItem:hover:not(:disabled) {
+  background: var(--gp-green-light);
+  color: var(--gp-green-deep);
+}
+.navItem:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.navItemActive {
+  background: var(--gp-green-light) !important;
+  color: var(--gp-green-deep) !important;
+}
+.navItem span:first-of-type { flex: 1; }
+.soon {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--gp-border);
+  color: #6b7280;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.sidebarFoot {
+  padding-top: 12px;
+  border-top: 1px solid var(--gp-border);
+}
+.userChip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+.userChip:hover { background: var(--gp-green-light); }
+.userAvatar {
+  width: 36px; height: 36px;
+  border-radius: 999px;
+  background: var(--gp-green);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.userInfo { min-width: 0; }
+.userName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gp-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.userMail {
+  font-size: 11px;
+  color: var(--gp-text-sec);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ───── Main column ───── */
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Top bar */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #fff;
+  border-bottom: 1px solid var(--gp-border);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.topbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  flex: 1;
+}
+.brandMobile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.fincaSelectorWrap {
+  position: relative;
+  min-width: 0;
+  flex: 1;
+  max-width: 320px;
+}
+.fincaSelector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 10px;
+  width: 100%;
+  min-width: 0;
+}
+.fincaSelector:hover {
+  background: var(--gp-green-light);
+}
+.fincaIcon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: var(--gp-green-light);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.fincaTxt { min-width: 0; flex: 1; }
+.fincaCaption {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--gp-text-sec);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.fincaName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gp-text);
+  display: flex; align-items: center; gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fincaMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 260px;
+  background: #fff;
+  border: 1px solid var(--gp-border);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  z-index: 30;
+}
+.fincaItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+.fincaItem:hover {
+  background: var(--gp-green-light);
+}
+.fincaItemActive {
+  background: var(--gp-green-light);
+}
+
+.topbarRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.iconBtn {
+  position: relative;
+  height: 40px;
+  min-width: 40px;
+  padding: 0 12px;
+  border-radius: 10px;
+  background: var(--gp-green-light);
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--gp-green-deep);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+.iconBtn:hover { background: #c8edd2; }
+.bellDot {
+  position: absolute;
+  top: 8px; right: 9px;
+  width: 8px; height: 8px;
+  border-radius: 999px;
+  background: #F4A261;
+  border: 1.5px solid var(--gp-green-light);
+}
+.primaryCta {
+  display: none;
+  background: var(--gp-green);
+  color: #fff;
+}
+.primaryCta:hover { background: var(--gp-green-deep); }
+.ctaLabel { display: none; }
+
+/* Content */
+.content {
+  flex: 1;
+  padding: 20px 16px 110px; /* bottom space for bottom nav on mobile */
+  position: relative;
+}
+
+/* Bottom nav (mobile only) */
+.bottomNav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background: #fff;
+  border-top: 1px solid var(--gp-border);
+  padding: 6px 0 calc(18px + env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+.bottomNavItem {
+  position: relative;
+  flex: 1;
+  padding: 6px 4px 2px;
+  background: transparent;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  text-decoration: none;
+  color: inherit;
+}
+.bottomNavActive {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--gp-green);
+}
+
+/* FAB */
+.fab {
+  position: fixed;
+  bottom: calc(90px + env(safe-area-inset-bottom));
+  right: 16px;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: var(--gp-green);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(45, 106, 79, 0.4),
+              0 2px 6px rgba(45, 106, 79, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 25;
+}
+
+/* ───── Tablet ─────────────────────────────────── */
+@media (min-width: 600px) {
+  .content { padding: 24px 24px 110px; }
+}
+
+/* ───── Desktop ────────────────────────────────── */
+@media (min-width: 1024px) {
+  .sidebar { display: flex; }
+  .brandMobile { display: none; }
+  .bottomNav { display: none; }
+  .fab { display: none; }
+
+  .topbar {
+    padding: 14px 28px;
+  }
+  .content {
+    padding: 28px 32px 48px;
+    max-width: 1280px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .primaryCta {
+    display: inline-flex;
+    padding: 0 16px;
+  }
+  .ctaLabel { display: inline; }
+}
+
+@media (min-width: 1280px) {
+  .content { padding: 32px 40px 48px; }
+}

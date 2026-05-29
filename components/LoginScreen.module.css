@@ -1,0 +1,322 @@
+.shell {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background: var(--gp-bg);
+}
+
+/* ───── Hero (top en mobile, left en desktop) ───── */
+.hero {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  padding: 28px 24px 36px;
+  background:
+    radial-gradient(120% 80% at 80% 0%, rgba(82, 183, 136, 0.35) 0%, transparent 60%),
+    linear-gradient(160deg, var(--gp-green-deep) 0%, var(--gp-green) 55%, #3f8c6b 100%);
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  max-width: 540px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+}
+
+.brandMark {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.brandName {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  line-height: 1.1;
+}
+
+.brandSub {
+  font-size: 11px;
+  opacity: 0.78;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.heroBody {
+  margin-top: 8px;
+}
+
+.heroTitle {
+  margin: 0 0 10px;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.15;
+}
+
+.heroLead {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.88;
+  line-height: 1.5;
+  max-width: 420px;
+}
+
+.bullets {
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 22px 0 0;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bullets li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  opacity: 0.94;
+}
+
+.bullets li span {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.heroFooter {
+  display: none;
+  margin-top: auto;
+  font-size: 11px;
+  opacity: 0.7;
+  letter-spacing: 0.3px;
+}
+
+/* Decorative leaves */
+.leaf1, .leaf2, .leaf3 {
+  position: absolute;
+  pointer-events: none;
+}
+.leaf1 { top: -80px; right: -80px; opacity: 0.10; }
+.leaf2 { top:  40%;  left: -100px; opacity: 0.08; }
+.leaf3 { bottom: -80px; right: 20%; opacity: 0.07; }
+
+/* ───── Form panel ───── */
+.formPanel {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px 40px;
+  background: var(--gp-bg);
+}
+
+.card {
+  width: 100%;
+  max-width: 440px;
+  background: #fff;
+  border: 1px solid var(--gp-border);
+  border-radius: 18px;
+  padding: 22px 20px 20px;
+  margin-top: -22px; /* Sobresale del hero en mobile */
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 18px 40px rgba(27, 67, 50, 0.08),
+              0 4px 14px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cardHead {
+  margin-bottom: 4px;
+}
+
+.cardTitle {
+  margin: 0 0 4px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--gp-text);
+}
+
+.cardLead {
+  margin: 0;
+  font-size: 13px;
+  color: var(--gp-text-sec);
+  line-height: 1.45;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: -2px;
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkBox {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  background: #fff;
+  border: 1.5px solid var(--gp-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s ease;
+}
+.checkBox[data-checked="true"] {
+  background: var(--gp-green);
+  border-color: var(--gp-green);
+}
+
+.checkLabel {
+  font-size: 13px;
+  color: var(--gp-text);
+  font-weight: 500;
+}
+
+.link, .linkStrong {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--gp-green);
+  font-weight: 600;
+  font-family: inherit;
+  padding: 0;
+}
+.linkStrong { font-weight: 700; }
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0;
+}
+.divider > span:first-child,
+.divider > span:last-child {
+  flex: 1;
+  height: 1px;
+  background: var(--gp-border);
+}
+.dividerLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gp-text-sec);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.googleBtn {
+  height: 48px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1.5px solid var(--gp-border);
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--gp-text);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.bottom {
+  text-align: center;
+  font-size: 13px;
+  color: var(--gp-text-sec);
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+/* ───── Tablet & up ───── */
+@media (min-width: 600px) {
+  .hero {
+    padding: 40px 32px 56px;
+  }
+  .heroTitle { font-size: 30px; }
+  .formPanel { padding: 32px 24px 56px; }
+  .card { margin-top: -32px; padding: 28px 24px; }
+}
+
+/* ───── Desktop: split-screen ───── */
+@media (min-width: 1024px) {
+  .shell {
+    grid-template-rows: none;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+  }
+
+  .hero {
+    padding: 56px 56px 48px;
+    min-height: 100vh;
+    display: flex;
+  }
+  .heroContent {
+    margin: 0;
+    max-width: 520px;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .heroTitle { font-size: 40px; line-height: 1.1; }
+  .heroLead  { font-size: 15.5px; }
+  .bullets, .heroFooter { display: flex; }
+
+  .formPanel {
+    padding: 56px;
+    align-items: center;
+    min-height: 100vh;
+  }
+  .card {
+    margin-top: 0;
+    max-width: 440px;
+    padding: 36px 32px 32px;
+    box-shadow: 0 24px 56px rgba(27, 67, 50, 0.10),
+                0 6px 18px rgba(0, 0, 0, 0.05);
+    animation: gp-scale-in .28s cubic-bezier(.2,.7,.3,1);
+  }
+  .cardTitle { font-size: 24px; }
+}
+
+/* ───── Wide desktop ───── */
+@media (min-width: 1440px) {
+  .hero { padding: 72px 80px 56px; }
+  .heroTitle { font-size: 46px; }
+  .heroContent { max-width: 560px; }
+}

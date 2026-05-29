@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1400" />
+<title>GanaderíaPro — Diseño UI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #F4F1EC; font-family: 'Inter', system-ui, sans-serif; }
+  * { box-sizing: border-box; }
+
+  /* Hide scrollbars inside framed devices for a cleaner artboard look */
+  ::-webkit-scrollbar { width: 0; height: 0; }
+
+  /* Animations used across the prototype */
+  @keyframes gp-slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  @keyframes gp-fade-in  { from { opacity: 0; } to { opacity: 1; } }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel" src="theme.jsx"></script>
+<script type="text/babel" src="data.jsx"></script>
+<script type="text/babel" src="ui.jsx"></script>
+<script type="text/babel" src="inventory.jsx"></script>
+<script type="text/babel" src="wizard.jsx"></script>
+<script type="text/babel" src="detail.jsx"></script>
+<script type="text/babel" src="exit.jsx"></script>
+<script type="text/babel" src="desktop.jsx"></script>
+<script type="text/babel" src="app.jsx"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="env,react">
+const PhoneArtboard = ({ children }) => (
+  <div style={{ width: 402, height: 874, position: 'relative' }}>
+    <IOSDevice width={402} height={874}>
+      <div style={{ position: 'absolute', inset: 0, paddingTop: 47 /* leave room under status bar */ }}>
+        {children}
+      </div>
+    </IOSDevice>
+  </div>
+);
+
+const Note = ({ title, children }) => (
+  <DCPostIt color="cream">
+    <div style={{ fontSize: 12, fontWeight: 700, color: '#4A3F2E', marginBottom: 6, letterSpacing: 0.2 }}>{title}</div>
+    <div style={{ fontSize: 11.5, color: '#5C5040', lineHeight: 1.5 }}>{children}</div>
+  </DCPostIt>
+);
+
+const App = () => (
+  <DesignCanvas>
+
+    <DCSection id="overview" title="GanaderíaPro" subtitle="Plataforma multi-finca de gestión ganadera · Paleta Verde Campo · Mobile-first 390px">
+      <DCArtboard id="cover" label="Resumen del sistema" width={680} height={874}>
+        <CoverArtboard />
+      </DCArtboard>
+      <DCArtboard id="tokens" label="Sistema visual · tokens" width={680} height={874}>
+        <TokensArtboard />
+      </DCArtboard>
+    </DCSection>
+
+    <DCSection id="mobile-inventory" title="1 · Inventario móvil" subtitle="Pantalla principal — lista de animales con filtros, métricas y FAB de registro">
+      <DCArtboard id="inv-default" label="Estado por defecto" width={420} height={874}>
+        <PhoneArtboard><MobileApp initialScreen="inventory" /></PhoneArtboard>
+      </DCArtboard>
+      <DCArtboard id="inv-filter" label="Filtro: Vendidos + Robados" width={420} height={874}>
+        <PhoneArtboard><MobileApp initialScreen="inventory" initialFincaIdx={1} /></PhoneArtboard>
+      </DCArtboard>
+      <DCArtboard id="inv-empty" label="Sin resultados" width={420} height={874}>
+        <PhoneArtboard><InventoryEmptyState /></PhoneArtboard>
+      </DCArtboard>
+    </DCSection>
+
+    <DCSection id="mobile-register" title="2 · Registrar animal" subtitle="Wizard de 3 pasos — campos condicionales, validación, navegación fija">
+      <DCArtboard id="reg-1" label="Paso 1 · Identificación" width={420} height={874}>
+        <PhoneArtboard><RegistrationDemo step={0} /></PhoneArtboard>
+      </DCArtboard>
+      <DCArtboard id="reg-2" label="Paso 2 · Categoría" width={420} height={874}>
+        <PhoneArtboard><RegistrationDemo step={1} /></PhoneArtboard>
+      </DCArtboard>
+      <DCArtboard id="reg-3" label="Paso 3 · Origen (Compra)" width={420} height={874}>
+        <PhoneArtboard><RegistrationDemo step={2} /></PhoneArtboard>
+      </DCArtboard>
+    </DCSection>
+
+    <DCSection id="mobile-detail" title="3 · Detalle del animal" subtitle="Sheet ascendente · 90% pantalla · acciones contextuales según estado">
+      <DCArtboard id="det-active" label="Animal activo" width={420} height={874}>
+        <PhoneArtboard><DetailDemo animal={ANIMALS[0]} /></PhoneArtboard>
+      </DCArtboard>
+      <DCArtboard id="det-sold" label="Animal vendido" width={420} height={874}>
+        <PhoneArtboard><DetailDemo animal={ANIMALS[4]} /></PhoneArtboard>
+      </DCArtboard>
+      <DCArtboard id="det-dead" label="Animal muerto" width={420} height={874}>
+        <PhoneArtboard><DetailDemo animal={ANIMALS[8]} /></PhoneArtboard>
+      </DCArtboard>
+    </DCSection>
+
+    <DCSection id="mobile-exit" title="4 · Registrar salida" subtitle="Modal sheet · campos dinámicos por causa · banner de confirmación">
+      <DCArtboard id="exit-empty" label="Sin causa seleccionada" width={420} height={874}>
+        <PhoneArtboard><ExitDemo /></PhoneArtboard>
+      </DCArtboard>
+      <DCArtboard id="exit-sale" label="Venta" width={420} height={874}>
+        <PhoneArtboard><ExitDemo causa="Venta" /></PhoneArtboard>
+      </DCArtboard>
+      <DCArtboard id="exit-death" label="Muerte" width={420} height={874}>
+        <PhoneArtboard><ExitDemo causa="Muerte" /></PhoneArtboard>
+      </DCArtboard>
+      <DCArtboard id="exit-move" label="Traslado" width={420} height={874}>
+        <PhoneArtboard><ExitDemo causa="Traslado" /></PhoneArtboard>
+      </DCArtboard>
+    </DCSection>
+
+    <DCSection id="mobile-other" title="Otras pestañas móviles" subtitle="Bottom nav de 4 íconos · módulos secundarios">
+      <DCArtboard id="finca-tab" label="Pestaña: Finca" width={420} height={874}>
+        <PhoneArtboard><MobileAppOnTab tab="finca" /></PhoneArtboard>
+      </DCArtboard>
+      <DCArtboard id="perfil-tab" label="Pestaña: Perfil" width={420} height={874}>
+        <PhoneArtboard><MobileAppOnTab tab="perfil" /></PhoneArtboard>
+      </DCArtboard>
+    </DCSection>
+
+    <DCSection id="desktop" title="Escritorio (1280px)" subtitle="Sidebar de módulos · tabla paginada · panel lateral de detalle">
+      <DCArtboard id="desktop-1" label="Vista completa" width={1280} height={820}>
+        <div style={{ width: 1280, height: 820, position: 'relative', overflow: 'hidden', borderRadius: 12 }}>
+          <DesktopApp />
+        </div>
+      </DCArtboard>
+    </DCSection>
+
+  </DesignCanvas>
+);
+
+// ────────────────────────────────────────────────────────────
+// Cover artboard — system summary
+// ────────────────────────────────────────────────────────────
+const CoverArtboard = () => (
+  <div style={{
+    width: 680, height: 874,
+    background: `linear-gradient(155deg, ${GP.greenDeep} 0%, ${GP.green} 55%, ${GP.greenMid} 100%)`,
+    color: '#fff', padding: 40, fontFamily: GP.font,
+    display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+    borderRadius: 8,
+  }}>
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{
+          width: 52, height: 52, borderRadius: 14,
+          background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          border: '1px solid rgba(255,255,255,0.3)',
+        }}>
+          <Icon name="leaf" size={26} color="#fff" strokeWidth={2} />
+        </div>
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 600, opacity: 0.85, letterSpacing: 0.5, textTransform: 'uppercase' }}>Diseño UI</div>
+          <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: -0.8 }}>GanaderíaPro</div>
+        </div>
+      </div>
+      <h1 style={{ fontSize: 48, fontWeight: 800, letterSpacing: -1.5, lineHeight: 1.05, margin: '40px 0 16px', maxWidth: 540 }}>
+        Gestión ganadera<br />pensada para el campo.
+      </h1>
+      <p style={{ fontSize: 16, lineHeight: 1.55, opacity: 0.88, maxWidth: 520, fontWeight: 400 }}>
+        Plataforma multi-finca, multi-tenant, optimizada para uso en celular con conectividad limitada.
+        Diseño táctil, jerarquía visual clara bajo luz solar, y trazabilidad completa de animales.
+      </p>
+    </div>
+
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
+      {[
+        { l: 'Mobile-first', v: '390px', s: 'iPhone 14 base' },
+        { l: 'Hit targets', v: '≥ 44px', s: 'Estándar iOS / Android' },
+        { l: 'Stack futuro', v: 'Next.js', s: 'Tailwind + shadcn/ui' },
+      ].map(s => (
+        <div key={s.l} style={{
+          padding: 16, borderRadius: 14,
+          background: 'rgba(255,255,255,0.12)',
+          border: '1px solid rgba(255,255,255,0.18)',
+        }}>
+          <div style={{ fontSize: 10, fontWeight: 700, opacity: 0.75, letterSpacing: 0.6, textTransform: 'uppercase' }}>{s.l}</div>
+          <div style={{ fontSize: 22, fontWeight: 700, marginTop: 6, letterSpacing: -0.3 }}>{s.v}</div>
+          <div style={{ fontSize: 11, opacity: 0.7, marginTop: 2 }}>{s.s}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+// ────────────────────────────────────────────────────────────
+// Tokens artboard — palette, type, components
+// ────────────────────────────────────────────────────────────
+const TokensArtboard = () => (
+  <div style={{
+    width: 680, height: 874, background: GP.bg, padding: 32, fontFamily: GP.font,
+    color: GP.text, borderRadius: 8, overflow: 'hidden',
+  }}>
+    <div style={{ fontSize: 11, fontWeight: 700, color: GP.textSec, letterSpacing: 0.8, textTransform: 'uppercase' }}>Sistema visual</div>
+    <h2 style={{ margin: '4px 0 22px', fontSize: 28, fontWeight: 800, letterSpacing: -0.6 }}>Tokens base</h2>
+
+    {/* Palette */}
+    <div style={{ fontSize: 11, fontWeight: 700, color: GP.textSec, letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 10 }}>Paleta — Verde Campo</div>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8, marginBottom: 22 }}>
+      {[
+        { name: 'Verde principal', hex: '#2D6A4F', use: 'Acciones · navbar' },
+        { name: 'Verde medio', hex: '#52B788', use: 'Activos · éxito' },
+        { name: 'Verde claro', hex: '#D8F3DC', use: 'Fondos suaves · chips' },
+        { name: 'Tierra', hex: '#A47148', use: 'Categoría carne' },
+        { name: 'Ámbar', hex: '#F4A261', use: 'Pesajes · alertas' },
+        { name: 'Rojo suave', hex: '#E76F51', use: 'Salidas · destructivo' },
+        { name: 'Gris texto', hex: '#374151', use: 'Texto principal' },
+        { name: 'Gris sec.', hex: '#9CA3AF', use: 'Texto secundario' },
+        { name: 'Fondo', hex: '#F9FAFB', use: 'App background' },
+        { name: 'Blanco', hex: '#FFFFFF', use: 'Cards · superficies' },
+      ].map(c => (
+        <div key={c.hex}>
+          <div style={{
+            height: 56, borderRadius: 10, background: c.hex,
+            border: c.hex === '#FFFFFF' ? `1px solid ${GP.border}` : 'none',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+          }} />
+          <div style={{ fontSize: 11, fontWeight: 600, marginTop: 6 }}>{c.name}</div>
+          <div style={{ fontSize: 10, color: GP.textSec, fontFamily: 'ui-monospace, Menlo, monospace' }}>{c.hex}</div>
+        </div>
+      ))}
+    </div>
+
+    {/* Type */}
+    <div style={{ fontSize: 11, fontWeight: 700, color: GP.textSec, letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 10 }}>Tipografía — Inter</div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 16, background: GP.white, borderRadius: 14, border: `1px solid ${GP.border}`, marginBottom: 20 }}>
+      <TypeRow label="Sección" size="20px / 600" style={{ fontSize: 20, fontWeight: 600 }}>Inventario de animales</TypeRow>
+      <TypeRow label="Tabla" size="14px / 400" style={{ fontSize: 14, fontWeight: 400 }}>CO-0421 · Margarita · Holstein</TypeRow>
+      <TypeRow label="Label" size="13px / 500" style={{ fontSize: 13, fontWeight: 500 }}>Número de arete</TypeRow>
+      <TypeRow label="Badge" size="12px / 600" style={{ fontSize: 12, fontWeight: 600, letterSpacing: 0.2 }}>ACTIVO</TypeRow>
+      <TypeRow label="Botón" size="15px / 600" style={{ fontSize: 15, fontWeight: 600 }}>Registrar animal</TypeRow>
+    </div>
+
+    {/* Status badges + components row */}
+    <div style={{ fontSize: 11, fontWeight: 700, color: GP.textSec, letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 10 }}>Estados — badge + color</div>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: 14, background: GP.white, borderRadius: 14, border: `1px solid ${GP.border}` }}>
+      {Object.keys(STATUS).map(k => <StatusBadge key={k} status={k} size="md" />)}
+    </div>
+  </div>
+);
+
+const TypeRow = ({ label, size, children, style }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '6px 0' }}>
+    <div style={{ width: 80 }}>
+      <div style={{ fontSize: 11, fontWeight: 600, color: GP.text }}>{label}</div>
+      <div style={{ fontSize: 10, color: GP.textSec, fontFamily: 'ui-monospace, Menlo, monospace' }}>{size}</div>
+    </div>
+    <div style={{ flex: 1, color: GP.text, ...style }}>{children}</div>
+  </div>
+);
+
+// ────────────────────────────────────────────────────────────
+// Demo wrappers — open specific overlays inside the mobile shell
+// ────────────────────────────────────────────────────────────
+const InventoryEmptyState = () => {
+  // Mobile inventory pre-filled with a query that returns 0 results
+  return <MobileAppWithQuery query="zzzz" />;
+};
+
+const MobileAppWithQuery = ({ query }) => {
+  // Render the mobile app and inject a query through a controlled InventoryScreen instance
+  // For simplicity reuse MobileApp but immediately set query via a child key trick — we just hand-build the screen
+  return (
+    <div style={{
+      position: 'absolute', inset: 0, background: GP.bg,
+      fontFamily: GP.font, color: GP.text, overflow: 'hidden',
+    }}>
+      <div style={{ position: 'absolute', inset: 0, overflowY: 'auto' }}>
+        <InventoryEmptyInline query={query} />
+      </div>
+      <BottomNav active="inventario" onChange={() => {}} />
+    </div>
+  );
+};
+
+// Custom inventory screen instance that starts with a query already typed
+const InventoryEmptyInline = ({ query: initialQ }) => {
+  const [query, setQuery] = React.useState(initialQ);
+  return (
+    <InventoryScreen
+      finca={FINCAS[0]} fincas={FINCAS}
+      onSwitchFinca={() => {}} onOpenAnimal={() => {}} onNewAnimal={() => {}}
+      _initialQuery={query}
+    />
+  );
+};
+
+const MobileAppOnTab = ({ tab }) => (
+  <div style={{
+    position: 'absolute', inset: 0, background: GP.bg,
+    fontFamily: GP.font, color: GP.text, overflow: 'hidden',
+  }}>
+    <div style={{ position: 'absolute', inset: 0, overflowY: 'auto' }}>
+      {tab === 'finca' ? <FincaScreen finca={FINCAS[0]} /> : <PerfilScreen />}
+    </div>
+    <BottomNav active={tab} onChange={() => {}} />
+  </div>
+);
+
+const RegistrationDemo = ({ step }) => {
+  // Build pre-filled data so each step looks alive
+  const seeds = [
+    { arete: 'CO-1521', nombre: 'Aurora', sexo: 'H', raza: 'Holstein', fechaNac: '2024-06-12', color: 'Blanca con manchas negras en cuello' },
+    { arete: 'CO-1521', nombre: 'Aurora', sexo: 'H', raza: 'Holstein', fechaNac: '2024-06-12', categoria: 'Vaquillona', proposito: 'Leche', lote: 'Potrero Norte' },
+    { arete: 'CO-1521', nombre: 'Aurora', sexo: 'H', raza: 'Holstein', fechaNac: '2024-06-12', categoria: 'Vaquillona', proposito: 'Leche', lote: 'Potrero Norte', tipoIngreso: 'Compra', fechaIngreso: '2026-05-20', proveedor: 'Hacienda La Esperanza', peso: '298', precio: '2400000', documento: 'GMI-44210' },
+  ];
+  return <RegisterWizardPreview initialStep={step} initialData={seeds[step]} />;
+};
+
+const RegisterWizardPreview = ({ initialStep, initialData }) => {
+  const [step] = React.useState(initialStep);
+  // Reuse the real RegisterWizard but force step + seed data — small fork to expose initial state
+  return (
+    <div style={{ position: 'absolute', inset: 0 }}>
+      <RegisterWizardSeeded forceStep={step} seed={initialData} />
+    </div>
+  );
+};
+
+// Variant of RegisterWizard with seeded state + forced step (for static screenshots)
+const RegisterWizardSeeded = ({ forceStep = 0, seed = {} }) => {
+  // We replicate the wizard structure but with internal state preset.
+  // The cleanest approach: drop a copy. But since the original lives in wizard.jsx,
+  // we use it directly via a forced-key remount trick won't work for step; so re-render the body manually.
+  return <WizardStatic step={forceStep} data={{
+    arete: '', nombre: '', raza: '', sexo: '', fechaNac: '', color: '',
+    categoria: '', proposito: '', lote: '',
+    tipoIngreso: '', fechaIngreso: '', proveedor: '', madre: '', peso: '', precio: '', documento: '', notas: '',
+    ...seed,
+  }} />;
+};
+
+// Static wizard shell that reuses Step1/Step2/Step3 via the wizard file's exports
+// Since wizard.jsx didn't export the per-step components, we render the RegisterWizard
+// but immediately advance state to the requested step on mount.
+const WizardStatic = ({ step, data }) => {
+  const ref = React.useRef(null);
+  return <RegisterWizardForceStep step={step} data={data} />;
+};
+
+// Build a header + body + footer wizard frame that mirrors RegisterWizard layout
+// using the Step1/Step2/Step3 internals (exposed on window via wizard.jsx).
+// Since we didn't export Step1/2/3, just render the real wizard and use a small effect
+// to bypass interaction (display-only).
+const RegisterWizardForceStep = ({ step, data }) => {
+  // Render the real RegisterWizard; we cannot set its internal state externally.
+  // Workaround: mount it and dispatch synthetic clicks via refs is brittle. Instead
+  // we re-implement a thin static frame using public primitives.
+  const steps = ['Identificación', 'Categoría', 'Origen'];
+  return (
+    <div style={{ position: 'absolute', inset: 0, background: GP.bg, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ background: GP.white, padding: '16px 16px 0', borderBottom: `1px solid ${GP.border}` }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: GP.borderSoft, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Icon name="x" size={18} color={GP.text} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 11, color: GP.textSec, fontWeight: 600, letterSpacing: 0.4, textTransform: 'uppercase' }}>Paso {step + 1} de 3</div>
+            <h2 style={{ margin: '2px 0 0', fontSize: 18, fontWeight: 700, color: GP.text }}>{steps[step]}</h2>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 8, paddingBottom: 14 }}>
+          {steps.map((s, i) => (
+            <div key={s} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div style={{ height: 3, borderRadius: 999, background: i <= step ? GP.green : GP.border }} />
+              <div style={{ fontSize: 10, fontWeight: 600, color: i <= step ? GP.green : GP.textSec, letterSpacing: 0.3, textTransform: 'uppercase' }}>{s}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '16px 16px 120px' }}>
+        {step === 0 && <StaticStep1 data={data} />}
+        {step === 1 && <StaticStep2 data={data} />}
+        {step === 2 && <StaticStep3 data={data} />}
+      </div>
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0,
+        background: GP.white, borderTop: `1px solid ${GP.border}`,
+        padding: '12px 16px 28px', display: 'flex', gap: 10,
+      }}>
+        {step > 0 && <Button variant="outline">← Anterior</Button>}
+        <Button variant="primary" fullWidth style={{ flex: 1 }}>
+          {step < 2 ? 'Siguiente →' : '✓ Guardar animal'}
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+// Mini-replicas of the wizard steps using already-built primitives
+const StaticStep1 = ({ data }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <Field label="Número de arete" required hint="Identificador único del animal"><Input value={data.arete} large prefix="🏷" /></Field>
+    <Field label="Nombre / alias" hint="Opcional — facilita reconocimiento"><Input value={data.nombre} placeholder="Ej. Margarita" /></Field>
+    <Field label="Sexo" required>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <StaticSexCard active={data.sexo === 'H'} sex="H" />
+        <StaticSexCard active={data.sexo === 'M'} sex="M" />
+      </div>
+    </Field>
+    <Field label="Raza" required>
+      <div style={{
+        height: 44, padding: '0 14px', background: GP.white,
+        border: `1.5px solid ${GP.border}`, borderRadius: 12,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        fontSize: 15, fontWeight: 500, color: data.raza ? GP.text : GP.textSec,
+      }}>
+        <span>{data.raza || 'Seleccionar raza'}</span>
+        <Icon name="chevD" size={16} color={GP.textSec} />
+      </div>
+    </Field>
+    <Field label="Fecha de nacimiento" required hint={data.fechaNac ? 'Edad calculada: 1a 11m' : ''}>
+      <Input value={data.fechaNac} />
+    </Field>
+    <Field label="Color y señas" hint="Marcas, manchas, características distintivas">
+      <Textarea value={data.color} rows={2} />
+    </Field>
+  </div>
+);
+
+const StaticSexCard = ({ active, sex }) => {
+  const isH = sex === 'H';
+  return (
+    <div style={{
+      height: 64, borderRadius: 14,
+      border: `1.5px solid ${active ? (isH ? GP.green : GP.earth) : GP.border}`,
+      background: active ? (isH ? GP.greenLight : GP.earthLight) : GP.white,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+    }}>
+      <Icon name={isH ? 'cow' : 'bull'} size={26} color={active ? (isH ? GP.green : GP.earth) : GP.textSec} strokeWidth={2} />
+      <div style={{ textAlign: 'left' }}>
+        <div style={{ fontSize: 15, fontWeight: 700, color: active ? (isH ? GP.greenDeep : '#5C3D1F') : GP.text }}>
+          {isH ? 'Hembra' : 'Macho'}
+        </div>
+        <div style={{ fontSize: 11, color: GP.textSec, marginTop: 1 }}>
+          {isH ? 'Vaca / Vaquillona' : 'Toro / Novillo'}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const StaticStep2 = ({ data }) => {
+  const cats = data.sexo === 'M' ? CATEGORIAS_M : CATEGORIAS_H;
+  const propositos = ['Leche', 'Carne', 'Doble propósito', 'Reproductor'];
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{
+        padding: '12px', background: GP.greenLight, borderRadius: 12,
+        display: 'flex', alignItems: 'center', gap: 10,
+      }}>
+        <Icon name="info" size={18} color={GP.green} />
+        <div style={{ fontSize: 12, color: GP.greenDeep, lineHeight: 1.4 }}>
+          Categorías filtradas para <strong>{data.sexo === 'M' ? 'macho' : 'hembra'}</strong>.
+        </div>
+      </div>
+      <Field label="Categoría" required>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {cats.map(c => <Pill key={c} active={data.categoria === c}>{c}</Pill>)}
+        </div>
+      </Field>
+      <Field label="Propósito" required>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {propositos.map(p => <StaticPurposeCard key={p} active={data.proposito === p} label={p} />)}
+        </div>
+      </Field>
+      <Field label="Lote / potrero" hint="Opcional — puedes asignarlo después">
+        <div style={{
+          height: 44, padding: '0 14px', background: GP.white,
+          border: `1.5px solid ${GP.border}`, borderRadius: 12,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          fontSize: 15, fontWeight: 500, color: data.lote ? GP.text : GP.textSec,
+        }}>
+          <span>{data.lote || 'Sin asignar'}</span>
+          <Icon name="chevD" size={16} color={GP.textSec} />
+        </div>
+      </Field>
+    </div>
+  );
+};
+
+const StaticPurposeCard = ({ active, label }) => {
+  const colors = {
+    'Leche':           { bg: GP.greenLight, fg: GP.greenDeep, accent: GP.green, icon: 'droplet' },
+    'Carne':           { bg: GP.earthLight, fg: '#5C3D1F', accent: GP.earth, icon: 'cow' },
+    'Doble propósito': { bg: '#F3E8FF', fg: '#5B21B6', accent: '#8B5CF6', icon: 'sync' },
+    'Reproductor':     { bg: GP.amberLight, fg: '#8A4F1B', accent: GP.amber, icon: 'bull' },
+  };
+  const c = colors[label];
+  return (
+    <div style={{
+      height: 72, borderRadius: 14,
+      border: `1.5px solid ${active ? c.accent : GP.border}`,
+      background: active ? c.bg : GP.white,
+      display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center',
+      padding: '0 14px', gap: 4,
+    }}>
+      <Icon name={c.icon} size={20} color={active ? c.accent : GP.textSec} />
+      <span style={{ fontSize: 13, fontWeight: 600, color: active ? c.fg : GP.text }}>{label}</span>
+    </div>
+  );
+};
+
+const StaticStep3 = ({ data }) => {
+  const tipos = [
+    { key: 'Nacimiento', icon: 'leaf' },
+    { key: 'Compra', icon: 'doc' },
+    { key: 'Donación', icon: 'sync' },
+    { key: 'Traslado', icon: 'arrowOut' },
+  ];
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <Field label="Tipo de ingreso" required>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {tipos.map(t => {
+            const active = data.tipoIngreso === t.key;
+            return (
+              <div key={t.key} style={{
+                height: 64, borderRadius: 14,
+                border: `1.5px solid ${active ? GP.green : GP.border}`,
+                background: active ? GP.greenLight : GP.white,
+                display: 'flex', alignItems: 'center', gap: 10, padding: '0 14px',
+              }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: 10,
+                  background: active ? GP.green : GP.borderSoft,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: active ? '#fff' : GP.text,
+                }}>
+                  <Icon name={t.icon} size={18} color="currentColor" />
+                </div>
+                <span style={{ fontSize: 14, fontWeight: 600, color: active ? GP.greenDeep : GP.text }}>{t.key}</span>
+              </div>
+            );
+          })}
+        </div>
+      </Field>
+      <Field label="Fecha de ingreso" required><Input value={data.fechaIngreso} /></Field>
+      {['Compra', 'Donación', 'Traslado'].includes(data.tipoIngreso) && (
+        <Field label="Proveedor" required><Input value={data.proveedor} /></Field>
+      )}
+      <Field label="Peso al ingreso" required><Input value={data.peso} suffix="kg" /></Field>
+      {data.tipoIngreso === 'Compra' && (
+        <Field label="Precio de compra"><Input value={data.precio} prefix="$" /></Field>
+      )}
+      {['Compra', 'Traslado'].includes(data.tipoIngreso) && (
+        <Field label="Documento / guía" hint="Guía de movilización o factura"><Input value={data.documento} /></Field>
+      )}
+    </div>
+  );
+};
+
+// ────────────────────────────────────────────────────────────
+// Detail demo — mobile inventory with the sheet open on a chosen animal
+// ────────────────────────────────────────────────────────────
+const DetailDemo = ({ animal }) => (
+  <div style={{ position: 'absolute', inset: 0, background: GP.bg, overflow: 'hidden' }}>
+    {/* faded background of inventory list */}
+    <div style={{ position: 'absolute', inset: 0, overflowY: 'auto', filter: 'brightness(0.95)' }}>
+      <InventoryScreen finca={FINCAS[0]} fincas={FINCAS} onSwitchFinca={() => {}} onOpenAnimal={() => {}} onNewAnimal={() => {}} />
+    </div>
+    <BottomNav active="inventario" onChange={() => {}} />
+    <AnimalDetail animal={animal} onClose={() => {}} onExit={() => {}} onWeigh={() => {}} />
+  </div>
+);
+
+// ────────────────────────────────────────────────────────────
+// Exit demo — pre-selected cause
+// ────────────────────────────────────────────────────────────
+const ExitDemo = ({ causa }) => (
+  <div style={{ position: 'absolute', inset: 0, background: GP.bg, overflow: 'hidden' }}>
+    <div style={{ position: 'absolute', inset: 0, overflowY: 'auto', filter: 'brightness(0.95)' }}>
+      <InventoryScreen finca={FINCAS[0]} fincas={FINCAS} onSwitchFinca={() => {}} onOpenAnimal={() => {}} onNewAnimal={() => {}} />
+    </div>
+    <BottomNav active="inventario" onChange={() => {}} />
+    <ExitFormPreseeded animal={ANIMALS[0]} causa={causa} />
+  </div>
+);
+
+// Static version of ExitForm that allows seeding the cause
+const ExitFormPreseeded = ({ animal, causa: initialCausa }) => {
+  const [causa] = React.useState(initialCausa || '');
+
+  const causas = [
+    { key: 'Venta',    icon: 'doc',      color: GP.green, bg: GP.greenLight, fg: GP.greenDeep },
+    { key: 'Muerte',   icon: 'warn',     color: GP.red,   bg: GP.redLight,   fg: '#7B2D17' },
+    { key: 'Robo',     icon: 'arrowOut', color: '#DC2626', bg: '#FEE2E2',    fg: '#7F1D1D' },
+    { key: 'Traslado', icon: 'sync',     color: '#3B82F6', bg: '#DBEAFE',    fg: '#1E3A8A' },
+  ];
+
+  return (
+    <div style={{
+      position: 'absolute', inset: 0, zIndex: 110,
+      display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+    }}>
+      <div style={{ position: 'absolute', inset: 0, background: 'rgba(17,24,39,0.55)' }} />
+      <div style={{
+        position: 'relative', zIndex: 1, background: GP.bg,
+        borderTopLeftRadius: 24, borderTopRightRadius: 24,
+        maxHeight: '92%', minHeight: '70%',
+        display: 'flex', flexDirection: 'column',
+        boxShadow: '0 -8px 32px rgba(0,0,0,0.22)', overflow: 'hidden',
+      }}>
+        <div style={{ padding: '10px 0 0', display: 'flex', justifyContent: 'center' }}>
+          <div style={{ width: 36, height: 4, borderRadius: 999, background: '#D1D5DB' }} />
+        </div>
+        <div style={{ padding: '12px 16px 14px', background: GP.white, borderBottom: `1px solid ${GP.border}` }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: GP.redLight, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name="arrowOut" size={18} color={GP.red} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: GP.text }}>Registrar salida</h2>
+              <div style={{ fontSize: 12, color: GP.textSec, marginTop: 1 }}>{animal.arete} · {animal.nombre}</div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ flex: 1, overflowY: 'auto', padding: '16px 16px 120px' }}>
+          <Field label="Causa de salida" required>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              {causas.map(c => {
+                const active = causa === c.key;
+                return (
+                  <div key={c.key} style={{
+                    height: 76, borderRadius: 14,
+                    border: `1.5px solid ${active ? c.color : GP.border}`,
+                    background: active ? c.bg : GP.white,
+                    display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center',
+                    padding: '0 14px', gap: 6,
+                  }}>
+                    <div style={{
+                      width: 32, height: 32, borderRadius: 8,
+                      background: active ? c.color : GP.borderSoft,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <Icon name={c.icon} size={16} color={active ? '#fff' : GP.textSec} />
+                    </div>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: active ? c.fg : GP.text }}>{c.key}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </Field>
+
+          <div style={{ height: 16 }} />
+          <Field label="Fecha de salida" required><Input value="2026-05-26" /></Field>
+          <div style={{ height: 16 }} />
+
+          {causa === 'Venta' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <Field label="Comprador" required><Input value="Hacienda San Andrés" /></Field>
+              <Field label="Precio de venta" required><Input value="3200000" prefix="$" /></Field>
+              <Field label="Destino" hint="Finca o destino del animal"><Input value="Yopal, Casanare" /></Field>
+              <Field label="Documento / factura"><Input value="FV-2026-441" /></Field>
+            </div>
+          )}
+          {causa === 'Muerte' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <Field label="Causa de muerte" required>
+                <div style={{
+                  height: 44, padding: '0 14px', background: GP.white,
+                  border: `1.5px solid ${GP.border}`, borderRadius: 12,
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  fontSize: 15, fontWeight: 500, color: GP.text,
+                }}>
+                  <span>Enfermedad</span>
+                  <Icon name="chevD" size={16} color={GP.textSec} />
+                </div>
+              </Field>
+              <Field label="Descripción"><Textarea value="Síntomas respiratorios durante 5 días. Tratamiento no exitoso." rows={3} /></Field>
+            </div>
+          )}
+          {causa === 'Traslado' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <Field label="Finca destino" required>
+                <div style={{
+                  height: 44, padding: '0 14px', background: GP.white,
+                  border: `1.5px solid ${GP.border}`, borderRadius: 12,
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  fontSize: 15, fontWeight: 500, color: GP.text,
+                }}>
+                  <span>Finca El Palmar</span>
+                  <Icon name="chevD" size={16} color={GP.textSec} />
+                </div>
+              </Field>
+              <Field label="Guía de movilización" hint="Documento ICA"><Input value="GMI-2026-08821" /></Field>
+            </div>
+          )}
+
+          {causa && (
+            <div style={{
+              marginTop: 18, padding: '12px 14px', background: '#FEF2F2',
+              border: `1px solid ${GP.red}`, borderRadius: 12,
+              display: 'flex', alignItems: 'flex-start', gap: 10,
+            }}>
+              <Icon name="warn" size={18} color={GP.red} style={{ marginTop: 1 }} />
+              <div style={{ fontSize: 12, color: '#7B2D17', lineHeight: 1.45 }}>
+                <strong style={{ display: 'block', fontSize: 13, marginBottom: 2 }}>Acción permanente</strong>
+                Esta acción actualizará el estado del animal a <strong>{causa.toLowerCase()}</strong> y no podrá deshacerse.
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0,
+          background: GP.white, borderTop: `1px solid ${GP.border}`,
+          padding: '12px 16px 28px', display: 'flex', gap: 10,
+        }}>
+          <Button variant="outline">Cancelar</Button>
+          <Button variant="danger" disabled={!causa} fullWidth style={{ flex: 1 }} icon={<Icon name="warn" size={16} color="#fff" />}>
+            Confirmar salida
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

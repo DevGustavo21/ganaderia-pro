@@ -1,0 +1,82 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.55);
+  z-index: 100;
+  animation: gp-fade-in .2s ease;
+}
+
+.dialogWrap {
+  position: fixed;
+  inset: 0;
+  z-index: 101;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  pointer-events: none;
+}
+
+.dialog {
+  position: relative;
+  pointer-events: auto;
+  background: var(--gp-bg);
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  width: 100%;
+  max-height: 92dvh;
+  min-height: 70dvh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.22);
+  animation: gp-slide-up .28s cubic-bezier(.2, .7, .3, 1);
+  overflow: hidden;
+}
+
+.dialogFull {
+  min-height: 100dvh;
+  max-height: 100dvh;
+  border-radius: 0;
+}
+
+.handle {
+  flex-shrink: 0;
+  padding: 10px 0 0;
+  display: flex;
+  justify-content: center;
+}
+.handle > span {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: #D1D5DB;
+}
+
+/* ───── Tablet & up: dialog centrado ───── */
+@media (min-width: 768px) {
+  .dialogWrap {
+    justify-content: center;
+    align-items: center;
+    padding: 32px;
+  }
+  .dialog {
+    width: 100%;
+    max-width: 640px;
+    border-radius: 20px;
+    min-height: 0;
+    max-height: calc(100dvh - 64px);
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.25),
+                0 8px 24px rgba(0, 0, 0, 0.10);
+    animation: gp-scale-in .25s cubic-bezier(.2, .7, .3, 1);
+  }
+  .dialogFull {
+    max-width: 720px;
+    min-height: 0;
+    max-height: calc(100dvh - 64px);
+  }
+  .handle { display: none; }
+}
+
+@media (min-width: 1024px) {
+  .dialog { max-width: 680px; }
+  .dialogFull { max-width: 760px; }
+}
