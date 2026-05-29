@@ -146,6 +146,7 @@ export const FincasScreen = ({
           personnel={personnel}
           collaboratorsSlot={collaboratorsSlot}
           onInviteCollaborator={onInviteCollaborator}
+          isAdmin={manageableSet.has(activa.id)}
         />
       ) : (
         <div
@@ -265,6 +266,7 @@ export const FincasScreen = ({
 const ActiveFincaDetail = ({
   activa, metrics, lots = [], personnel = [],
   collaboratorsSlot = null, onInviteCollaborator = null,
+  isAdmin = false,
 }) => {
   const m = metrics || { activos: 0, hembras: 0, machos: 0 };
   return (
@@ -286,7 +288,7 @@ const ActiveFincaDetail = ({
               {activa.ubicacion} · {activa.hectareas} ha · Propósito: {activa.proposito}
             </div>
           </div>
-          {onInviteCollaborator && (
+          {isAdmin && onInviteCollaborator && (
             <button
               type="button"
               onClick={onInviteCollaborator}
@@ -315,14 +317,16 @@ const ActiveFincaDetail = ({
           <Stat label="Hembras"  value={m.hembras} />
           <Stat label="Machos"   value={m.machos} />
           <Stat label="Lotes"    value={lots.length} />
-          <Stat label="Personal" value={personnel.length} />
+          {isAdmin && <Stat label="Personal" value={personnel.length} />}
         </div>
       </div>
 
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gridTemplateColumns: isAdmin
+            ? 'repeat(auto-fit, minmax(280px, 1fr))'
+            : '1fr',
           gap: 16,
         }}
       >
@@ -360,54 +364,56 @@ const ActiveFincaDetail = ({
           </div>
         </section>
 
-        <section>
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <h3 style={SECTION_TITLE_STYLE}>Personal externo</h3>
-            <span style={{ fontSize: 12, color: GP.textSec }}>{personnel.length} registrados</span>
-          </div>
-          <div
-            style={{
-              display: 'flex', flexDirection: 'column',
-              background: GP.white, borderRadius: 14, border: `1px solid ${GP.border}`,
-              overflow: 'hidden',
-            }}
-          >
-            {personnel.length === 0 ? (
-              <div style={{ padding: '20px 16px', fontSize: 13, color: GP.textSec }}>
-                Aún no hay personal asignado.
-              </div>
-            ) : personnel.map((p, i, arr) => (
-              <div
-                key={p.id}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '12px 14px',
-                  borderBottom: i < arr.length - 1 ? `1px solid ${GP.borderSoft}` : 'none',
-                }}
-              >
+        {isAdmin && (
+          <section>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+              <h3 style={SECTION_TITLE_STYLE}>Personal externo</h3>
+              <span style={{ fontSize: 12, color: GP.textSec }}>{personnel.length} registrados</span>
+            </div>
+            <div
+              style={{
+                display: 'flex', flexDirection: 'column',
+                background: GP.white, borderRadius: 14, border: `1px solid ${GP.border}`,
+                overflow: 'hidden',
+              }}
+            >
+              {personnel.length === 0 ? (
+                <div style={{ padding: '20px 16px', fontSize: 13, color: GP.textSec }}>
+                  Aún no hay personal asignado.
+                </div>
+              ) : personnel.map((p, i, arr) => (
                 <div
+                  key={p.id}
                   style={{
-                    width: 36, height: 36, borderRadius: 999,
-                    background: GP.greenLight, color: GP.greenDeep,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontWeight: 700, fontSize: 12, flexShrink: 0,
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '12px 14px',
+                    borderBottom: i < arr.length - 1 ? `1px solid ${GP.borderSoft}` : 'none',
                   }}
                 >
-                  {initials(p.full_name || p.nombre || '?')}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: GP.text }}>{p.full_name || p.nombre}</div>
-                  <div style={{ fontSize: 11, color: GP.textSec, marginTop: 2 }}>
-                    {(p.role || p.rol || '—')} {p.phone || p.telefono ? `· ${p.phone || p.telefono}` : ''}
+                  <div
+                    style={{
+                      width: 36, height: 36, borderRadius: 999,
+                      background: GP.greenLight, color: GP.greenDeep,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontWeight: 700, fontSize: 12, flexShrink: 0,
+                    }}
+                  >
+                    {initials(p.full_name || p.nombre || '?')}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: GP.text }}>{p.full_name || p.nombre}</div>
+                    <div style={{ fontSize: 11, color: GP.textSec, marginTop: 2 }}>
+                      {(p.role || p.rol || '—')} {p.phone || p.telefono ? `· ${p.phone || p.telefono}` : ''}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </section>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
 
-      {collaboratorsSlot}
+      {isAdmin && collaboratorsSlot}
     </>
   );
 };

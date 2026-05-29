@@ -16,14 +16,20 @@ export const AppLayout = ({ initialFarms = [], authUser = null, children }) => (
 const AppShellWithActions = ({ children }) => {
   const pathname = usePathname();
   const router = useRouter();
-  const { finca } = useFinca();
+  const { finca, canEdit } = useFinca();
   const [wizardOpen, setWizardOpen] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const canRegister =
-    !!finca && (pathname === '/inventario' || pathname?.startsWith('/inventario'));
+    !!finca
+    && canEdit
+    && (pathname === '/inventario' || pathname?.startsWith('/inventario'));
 
   const handleSubmitAnimal = async (data) => {
+    if (!canEdit) {
+      alert('Tu rol es de lector. No tienes permiso para registrar animales.');
+      return;
+    }
     setSaving(true);
     try {
       const res = await registerAnimalAction({ fincaId: finca.id, data });
@@ -46,7 +52,7 @@ const AppShellWithActions = ({ children }) => {
         {children}
       </AppShell>
 
-      {wizardOpen && finca && (
+      {wizardOpen && finca && canEdit && (
         <RegisterWizard
           finca={finca}
           saving={saving}

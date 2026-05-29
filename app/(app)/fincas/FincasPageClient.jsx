@@ -66,25 +66,33 @@ export const FincasPageClient = () => {
     return () => { cancelled = true; };
   }, [fincas]);
 
-  // Lotes + personal de la finca activa.
+  // Lotes (todos los miembros) + personal (solo admins/owner).
   const loadDetails = useCallback(async () => {
     if (!finca || !isSupabaseConfigured()) {
       setLots([]);
       setPersonnel([]);
       return;
     }
+    const isAdminHere = ADMIN_ROLES.has(membershipRoles[finca.id]);
     try {
       const supabase = supabaseBrowser();
-      const [lotsRes, persRes] = await Promise.all([
-        supabase.from('lots').select('id, name, area_ha').eq('farm_id', finca.id).order('name'),
-        supabase.from('personnel').select('id, full_name, role, phone, email').eq('farm_id', finca.id).order('full_name'),
-      ]);
+      const lotsRes = await supabase
+        .from('lots').select('id, name, area_ha')
+        .eq('farm_id', finca.id).order('name');
       setLots(lotsRes.data ?? []);
-      setPersonnel(persRes.data ?? []);
+
+      if (isAdminHere) {
+        const persRes = await supabase
+          .from('personnel').select('id, full_name, role, phone, email')
+          .eq('farm_id', finca.id).order('full_name');
+        setPersonnel(persRes.data ?? []);
+      } else {
+        setPersonnel([]);
+      }
     } catch (err) {
       console.error('Error cargando detalle de finca:', err);
     }
-  }, [finca]);
+  }, [finca, membershipRoles]);
 
   useEffect(() => {
     loadDetails();
@@ -166,7 +174,7 @@ export const FincasPageClient = () => {
         }
         onInviteToFarm={manageableFarms.length > 0 ? handleInviteToFarm : null}
         manageableFarmIds={manageableFarmIds}
-        collaboratorsSlot={finca ? (
+        collaboratorsSlot={finca && manageableFarmIds.has(finca.id) ? (
           <CollaboratorsPanel
             key={`panel-${finca.id}-${panelRefreshKey}`}
             farm={finca}

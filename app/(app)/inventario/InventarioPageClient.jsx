@@ -35,7 +35,7 @@ const computeMetrics = (animals = [], personnelCount = 0) => {
 
 export const InventarioPageClient = () => {
   const router = useRouter();
-  const { finca, ready } = useFinca();
+  const { finca, ready, canEdit, canAdmin } = useFinca();
   const [animals, setAnimals] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -86,8 +86,14 @@ export const InventarioPageClient = () => {
   }
 
   const metrics = computeMetrics(animals, 0);
+  const canEditAnimals = canEdit;
+  const canRegisterExit = canAdmin;
 
   const handleRegister = async (data) => {
+    if (!canEditAnimals) {
+      alert('Tu rol es de lector. No tienes permiso para registrar animales.');
+      return;
+    }
     setSaving(true);
     const res = await registerAnimalAction({ fincaId: finca.id, data });
     if (!res.ok) {
@@ -117,6 +123,10 @@ export const InventarioPageClient = () => {
 
   const handleEdit = async (payload) => {
     if (!selected) return;
+    if (!canEditAnimals) {
+      alert('Tu rol es de lector. No tienes permiso para editar animales.');
+      return;
+    }
     setSaving(true);
     const res = await updateAnimalDetailsAction({
       animalId: selected.id,
@@ -155,6 +165,10 @@ export const InventarioPageClient = () => {
   };
 
   const handleExit = async (payload) => {
+    if (!canRegisterExit) {
+      alert('Solo un administrador puede registrar salidas.');
+      return;
+    }
     setSaving(true);
     const res = await registerExitAction({
       animalId: selected.id,
@@ -185,8 +199,9 @@ export const InventarioPageClient = () => {
         animals={animals}
         metrics={metrics}
         loading={loading}
+        canCreate={canEditAnimals}
         onOpenAnimal={(a) => { setSelected(a); setModal('detail'); }}
-        onNewAnimal={() => setModal('wizard')}
+        onNewAnimal={() => canEditAnimals && setModal('wizard')}
       />
 
       {modal === 'wizard' && (
@@ -204,6 +219,8 @@ export const InventarioPageClient = () => {
           onClose={() => setModal(null)}
           onExit={() => setModal('exit')}
           onEdit={() => setModal('edit')}
+          canEdit={canEditAnimals}
+          canExit={canRegisterExit}
         />
       )}
       {modal === 'edit' && selected && (

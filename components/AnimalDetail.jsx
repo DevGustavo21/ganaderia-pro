@@ -66,7 +66,7 @@ const rowToTimelineEvent = (row, animal) => {
   return { ...base, detalle: row.description || '' };
 };
 
-export const AnimalDetail = ({ animal, onClose, onExit, onEdit }) => {
+export const AnimalDetail = ({ animal, onClose, onExit, onEdit, canEdit = false, canExit = false }) => {
   const isActive = animal?.estado === 'activo';
   const [events, setEvents] = useState(null);
   const [loadingEvents, setLoadingEvents] = useState(false);
@@ -202,10 +202,19 @@ export const AnimalDetail = ({ animal, onClose, onExit, onEdit }) => {
           </div>
         </div>
 
-        {isActive && (
-          <div style={{ padding: '16px 20px 8px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <Button variant="primary" onClick={onEdit} icon={<Icon name="settings" size={16} color="#fff" />} fullWidth>Editar</Button>
-            <Button variant="danger" onClick={onExit} icon={<Icon name="arrowOut" size={16} color="#fff" />} fullWidth>Salida</Button>
+        {isActive && (canEdit || canExit) && (
+          <div style={{
+            padding: '16px 20px 8px',
+            display: 'grid',
+            gridTemplateColumns: canEdit && canExit ? '1fr 1fr' : '1fr',
+            gap: 10,
+          }}>
+            {canEdit && (
+              <Button variant="primary" onClick={onEdit} icon={<Icon name="settings" size={16} color="#fff" />} fullWidth>Editar</Button>
+            )}
+            {canExit && (
+              <Button variant="danger" onClick={onExit} icon={<Icon name="arrowOut" size={16} color="#fff" />} fullWidth>Salida</Button>
+            )}
           </div>
         )}
 

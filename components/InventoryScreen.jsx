@@ -15,6 +15,7 @@ export const InventoryScreen = ({
   animals = [],
   metrics = EMPTY_METRICS,
   loading = false,
+  canCreate = false,
   onOpenAnimal,
   onNewAnimal,
 }) => {
@@ -50,15 +51,17 @@ export const InventoryScreen = ({
             {metrics.activos} animales activos · {animals.length} en total
           </p>
         </div>
-        <Button
-          variant="primary"
-          onClick={onNewAnimal}
-          icon={<Icon name="plus" size={16} color="#fff" strokeWidth={2.2} />}
-          style={{ flexShrink: 0 }}
-          className={styles.headCta}
-        >
-          Registrar animal
-        </Button>
+        {canCreate && (
+          <Button
+            variant="primary"
+            onClick={onNewAnimal}
+            icon={<Icon name="plus" size={16} color="#fff" strokeWidth={2.2} />}
+            style={{ flexShrink: 0 }}
+            className={styles.headCta}
+          >
+            Registrar animal
+          </Button>
+        )}
       </header>
 
       <section className={styles.metrics}>
@@ -90,16 +93,20 @@ export const InventoryScreen = ({
           <Icon name="cow" size={32} color={GP.textSec} />
           <div className={styles.emptyTitle}>Aún no hay animales</div>
           <div className={styles.emptyHint}>
-            Empieza registrando tu primer animal en esta finca.
+            {canCreate
+              ? 'Empieza registrando tu primer animal en esta finca.'
+              : 'Tu rol es de lectura. Puedes consultar el inventario cuando el equipo agregue animales.'}
           </div>
-          <Button
-            variant="primary"
-            onClick={onNewAnimal}
-            icon={<Icon name="plus" size={16} color="#fff" strokeWidth={2.2} />}
-            style={{ marginTop: 12 }}
-          >
-            Registrar primer animal
-          </Button>
+          {canCreate && (
+            <Button
+              variant="primary"
+              onClick={onNewAnimal}
+              icon={<Icon name="plus" size={16} color="#fff" strokeWidth={2.2} />}
+              style={{ marginTop: 12 }}
+            >
+              Registrar primer animal
+            </Button>
+          )}
         </div>
       ) : filtered.length === 0 ? (
         <div className={styles.empty}>
